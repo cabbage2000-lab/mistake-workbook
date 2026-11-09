@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "pathBase": "temporary-install-root",
+  "doctor": {
+    "node": "v24.13.0",
+    "hostVision": "需宿主实际读取附件验证；脚本不提供 OCR",
+    "writable": true,
+    "font": "bundled",
+    "pdf": true,
+    "browser": "157.0.8103.38"
+  },
+  "questions": 6,
+  "paper": "A4",
+  "preview": "work/exports/r0001-923b2bef/数学错题重做-A4-2026-11-09-r1-学生卷.html",
+  "pdf": "work/exports/r0001-86abd20d/数学错题重做-A4-2026-11-09-r1-学生卷.pdf",
+  "answers": "work/exports/r0001-86abd20d/数学错题重做-A4-2026-11-09-r1-答案册.pdf",
+  "missingFontFailureAndRetry": true
+}

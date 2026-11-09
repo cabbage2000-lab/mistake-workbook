@@ -1,0 +1,1369 @@
+{
+  "kind": "original synthetic acceptance material",
+  "questions": [
+    {
+      "id": "math-1",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 1 题",
+          "originalNumber": "1"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "28 + 37 = ______"
+        }
+      ],
+      "keyCharacters": [
+        "28 + 37 = ______"
+      ]
+    },
+    {
+      "id": "math-2",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 2 题",
+          "originalNumber": "2"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "90 − 46 = ______"
+        }
+      ],
+      "keyCharacters": [
+        "90 − 46 = ______"
+      ]
+    },
+    {
+      "id": "math-3",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 3 题",
+          "originalNumber": "3"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "7 × 8 = ______"
+        }
+      ],
+      "keyCharacters": [
+        "7 × 8 = ______"
+      ]
+    },
+    {
+      "id": "math-4",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 4 题",
+          "originalNumber": "4"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "64 ÷ 8 = ______"
+        }
+      ],
+      "keyCharacters": [
+        "64 ÷ 8 = ______"
+      ]
+    },
+    {
+      "id": "math-5",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 5 题",
+          "originalNumber": "5"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "3.6 + 0.45 = ______"
+        }
+      ],
+      "keyCharacters": [
+        "3.6 + 0.45 = ______"
+      ]
+    },
+    {
+      "id": "math-6",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 6 题",
+          "originalNumber": "6"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "2.5 × 4 = ______"
+        }
+      ],
+      "keyCharacters": [
+        "2.5 × 4 = ______"
+      ]
+    },
+    {
+      "id": "math-7",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 7 题",
+          "originalNumber": "7"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "用竖式计算：367 + 458"
+        }
+      ],
+      "keyCharacters": [
+        "用竖式计算：367 + 458"
+      ]
+    },
+    {
+      "id": "math-8",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 8 题",
+          "originalNumber": "8"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "用竖式计算：802 − 376"
+        }
+      ],
+      "keyCharacters": [
+        "用竖式计算：802 − 376"
+      ]
+    },
+    {
+      "id": "math-9",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 9 题",
+          "originalNumber": "9"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "用竖式计算：24 × 16"
+        }
+      ],
+      "keyCharacters": [
+        "用竖式计算：24 × 16"
+      ]
+    },
+    {
+      "id": "math-10",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 10 题",
+          "originalNumber": "10"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "计算：(125 + 75) ÷ 8"
+        }
+      ],
+      "keyCharacters": [
+        "计算：(125 + 75) ÷ 8"
+      ]
+    },
+    {
+      "id": "math-11",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 11 题",
+          "originalNumber": "11"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "计算：36 × 5 − 84 ÷ 7"
+        }
+      ],
+      "keyCharacters": [
+        "计算：36 × 5 − 84 ÷ 7"
+      ]
+    },
+    {
+      "id": "math-12",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 12 题",
+          "originalNumber": "12"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "计算：72 ÷ (3 × 4)"
+        }
+      ],
+      "keyCharacters": [
+        "计算：72 ÷ (3 × 4)"
+      ]
+    },
+    {
+      "id": "math-13",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 13 题",
+          "originalNumber": "13"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "图书角原有 48 本书，又买来 26 本，借出 19 本。现在有多少本书？"
+        }
+      ],
+      "keyCharacters": [
+        "图书角原有 48 本书，又买来 26 本，借出 19 本。现在有多少本书？"
+      ]
+    },
+    {
+      "id": "math-14",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 14 题",
+          "originalNumber": "14"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "一辆汽车每小时行驶 65 千米，3 小时后距离目的地还有 45 千米。全程多少千米？"
+        }
+      ],
+      "keyCharacters": [
+        "一辆汽车每小时行驶 65 千米，3 小时后距离目的地还有 45 千米。全程多少千米？"
+      ]
+    },
+    {
+      "id": "math-15",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 15 题",
+          "originalNumber": "15"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "一根绳子长 8 米，用去 2.75 米，又用去 1.8 米。还剩多少米？"
+        }
+      ],
+      "keyCharacters": [
+        "一根绳子长 8 米，用去 2.75 米，又用去 1.8 米。还剩多少米？"
+      ]
+    },
+    {
+      "id": "math-16",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 16 题",
+          "originalNumber": "16"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "下列各数中，最接近 1 的是（　）。"
+        },
+        {
+          "type": "options",
+          "items": [
+            "A. 0.89",
+            "B. 1.02",
+            "C. 1.10"
+          ]
+        }
+      ],
+      "keyCharacters": [
+        "下列各数中，最接近 1 的是（　）。"
+      ]
+    },
+    {
+      "id": "math-17",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 17 题",
+          "originalNumber": "17"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "在横线上填写合适的数。"
+        },
+        {
+          "type": "formula",
+          "tex": "\\frac{1}{2}+\\frac{1}{4}=\\underline{\\qquad}"
+        }
+      ],
+      "keyCharacters": [
+        "在横线上填写合适的数。"
+      ]
+    },
+    {
+      "id": "math-18",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S4",
+          "location": "图片中央三角形区域"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "下图每个小方格的边长为 1 厘米，求三角形的面积。"
+        },
+        {
+          "type": "image",
+          "asset": "resources/geometry.png",
+          "alt": "底 6 格、高 4 格的直角三角形",
+          "widthMm": 70,
+          "minWidthMm": 50,
+          "containsWork": false,
+          "retainWorkConfirmed": false
+        }
+      ],
+      "keyCharacters": [
+        "下图每个小方格的边长为 1 厘米，求三角形的面积。"
+      ]
+    },
+    {
+      "id": "math-19",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S5",
+          "location": "统计图及下方两小题"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "观察两个小组收集废纸的统计图，完成下列问题。"
+        },
+        {
+          "type": "image",
+          "asset": "resources/chart.png",
+          "alt": "两组统计柱形图，第一组 4 格、第二组 6 格",
+          "widthMm": 80,
+          "minWidthMm": 35,
+          "containsWork": false,
+          "retainWorkConfirmed": false
+        },
+        {
+          "type": "subquestion",
+          "label": "（1）第二组比第一组多收集多少份？",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "每格代表 5 份，请列式计算。"
+            }
+          ],
+          "workspace": {
+            "mm": 24
+          }
+        },
+        {
+          "type": "subquestion",
+          "label": "（2）两组共收集多少份？",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "请写出计算过程。"
+            }
+          ],
+          "workspace": {
+            "mm": 24
+          }
+        }
+      ],
+      "keyCharacters": [
+        "观察两个小组收集废纸的统计图，完成下列问题。"
+      ]
+    },
+    {
+      "id": "math-20",
+      "subject": "math",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 20 题",
+          "originalNumber": "20"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "根据表格填空。"
+        },
+        {
+          "type": "table",
+          "rows": [
+            [
+              "物品",
+              "单价（元）",
+              "数量"
+            ],
+            [
+              "铅笔",
+              "2",
+              "6"
+            ],
+            [
+              "橡皮",
+              "3",
+              "4"
+            ]
+          ]
+        }
+      ],
+      "keyCharacters": [
+        "根据表格填空。"
+      ]
+    },
+    {
+      "id": "chinese-1",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 1 题",
+          "originalNumber": "1"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "pinyin",
+          "text": "chūn tiān",
+          "cells": 2
+        }
+      ],
+      "keyCharacters": [
+        "chūn tiān"
+      ]
+    },
+    {
+      "id": "chinese-2",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 2 题",
+          "originalNumber": "2"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "pinyin",
+          "text": "xué xiào",
+          "cells": 2
+        }
+      ],
+      "keyCharacters": [
+        "xué xiào"
+      ]
+    },
+    {
+      "id": "chinese-3",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 3 题",
+          "originalNumber": "3"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "pinyin",
+          "text": "lǜ sè",
+          "cells": 2
+        }
+      ],
+      "keyCharacters": [
+        "lǜ sè"
+      ]
+    },
+    {
+      "id": "chinese-4",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 4 题",
+          "originalNumber": "4"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "pinyin",
+          "text": "péng you",
+          "cells": 2
+        }
+      ],
+      "keyCharacters": [
+        "péng you"
+      ]
+    },
+    {
+      "id": "chinese-5",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 5 题",
+          "originalNumber": "5"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "pinyin",
+          "text": "kuài lè",
+          "cells": 2
+        }
+      ],
+      "keyCharacters": [
+        "kuài lè"
+      ]
+    },
+    {
+      "id": "chinese-6",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 6 题",
+          "originalNumber": "6"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "pinyin",
+          "text": "cháng jiāng",
+          "cells": 2
+        }
+      ],
+      "keyCharacters": [
+        "cháng jiāng"
+      ]
+    },
+    {
+      "id": "chinese-7",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 7 题",
+          "originalNumber": "7"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "pinyin",
+          "text": "yīn yuè",
+          "cells": 2
+        }
+      ],
+      "keyCharacters": [
+        "yīn yuè"
+      ]
+    },
+    {
+      "id": "chinese-8",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 8 题",
+          "originalNumber": "8"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "pinyin",
+          "text": "huā duǒ",
+          "cells": 2
+        }
+      ],
+      "keyCharacters": [
+        "huā duǒ"
+      ]
+    },
+    {
+      "id": "chinese-9",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 9 题",
+          "originalNumber": "9"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "copy",
+          "word": "认真",
+          "repeats": 3
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "chinese-10",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 10 题",
+          "originalNumber": "10"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "copy",
+          "word": "河流",
+          "repeats": 3
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "chinese-11",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 11 题",
+          "originalNumber": "11"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "copy",
+          "word": "森林",
+          "repeats": 3
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "chinese-12",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 12 题",
+          "originalNumber": "12"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "copy",
+          "word": "勇敢",
+          "repeats": 3
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "chinese-13",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 13 题",
+          "originalNumber": "13"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "选词填空：平静、安静。教室里十分（　）。"
+        }
+      ],
+      "keyCharacters": [
+        "选词填空：平静、安静。教室里十分（　）。"
+      ]
+    },
+    {
+      "id": "chinese-14",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 14 题",
+          "originalNumber": "14"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "给“行”选择正确读音：一行（háng / xíng）大雁飞过。"
+        }
+      ],
+      "keyCharacters": [
+        "给“行”选择正确读音：一行（háng / xíng）大雁飞过。"
+      ]
+    },
+    {
+      "id": "chinese-15",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 15 题",
+          "originalNumber": "15"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "把句子补充完整：春天来了，________________。"
+        }
+      ],
+      "keyCharacters": [
+        "把句子补充完整：春天来了，________________。"
+      ]
+    },
+    {
+      "id": "chinese-16",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 16 题",
+          "originalNumber": "16"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "用“因为……所以……”写一句话。"
+        }
+      ],
+      "keyCharacters": [
+        "用“因为……所以……”写一句话。"
+      ]
+    },
+    {
+      "id": "chinese-17",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 17 题",
+          "originalNumber": "17"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "判断下面的说法是否正确：句号表示一句话说完了。（　）"
+        }
+      ],
+      "keyCharacters": [
+        "判断下面的说法是否正确：句号表示一句话说完了。（　）"
+      ]
+    },
+    {
+      "id": "chinese-18",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 18 题",
+          "originalNumber": "18"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "给下面的句子加标点：你今天去图书馆吗"
+        }
+      ],
+      "keyCharacters": [
+        "给下面的句子加标点：你今天去图书馆吗"
+      ]
+    },
+    {
+      "id": "chinese-19",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 19 题",
+          "originalNumber": "19"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "小溪从山间流过。清晨，小鸟在枝头唱歌，孩子们沿着小路走向学校。大家约定保护水源，让小溪一直清澈。"
+        },
+        {
+          "type": "subquestion",
+          "label": "（1）故事发生在什么时候？",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "请从文中找出有关词语。"
+            }
+          ],
+          "workspace": {
+            "mm": 16
+          }
+        },
+        {
+          "type": "subquestion",
+          "label": "（2）孩子们作出了什么约定？",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "请用一句话回答。"
+            }
+          ],
+          "workspace": {
+            "mm": 24
+          }
+        }
+      ],
+      "keyCharacters": [
+        "小溪从山间流过。清晨，小鸟在枝头唱歌，孩子们沿着小路走向学校。大家约定保护水源，让小溪一直清澈。"
+      ]
+    },
+    {
+      "id": "chinese-20",
+      "subject": "chinese",
+      "sourceRefs": [
+        {
+          "sourceId": "S2",
+          "location": "第 20 题",
+          "originalNumber": "20"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "阅读下面的长篇材料。\n第1段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第2段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第3段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第4段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第5段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第6段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第7段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第8段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第9段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第10段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第11段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第12段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第13段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第14段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第15段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第16段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第17段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第18段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第19段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第20段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第21段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第22段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第23段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第24段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第25段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第26段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第27段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第28段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第29段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第30段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。"
+        },
+        {
+          "type": "subquestion",
+          "label": "（1）同学们记录了哪些内容？",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "结合材料作答。"
+            }
+          ],
+          "workspace": {
+            "mm": 32
+          }
+        },
+        {
+          "type": "subquestion",
+          "label": "（2）你还想观察什么？",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "写出自己的计划。"
+            }
+          ],
+          "workspace": {
+            "mm": 32
+          }
+        }
+      ],
+      "keyCharacters": [
+        "阅读下面的长篇材料。\n第1段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第2段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第3段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第4段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第5段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第6段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第7段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第8段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第9段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第10段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第11段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第12段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第13段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第14段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第15段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第16段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第17段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第18段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第19段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第20段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第21段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第22段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第23段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第24段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第25段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第26段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第27段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第28段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第29段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。\n第30段：周末，小林和同学来到自然公园，观察树叶、记录天气。他们发现不同树木的叶子各有特点，并认真整理了观察笔记。"
+      ]
+    },
+    {
+      "id": "english-1",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 1 题",
+          "originalNumber": "1"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "苹果",
+          "english": "apple",
+          "direction": "zh-en"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-2",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 2 题",
+          "originalNumber": "2"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "学校",
+          "english": "school",
+          "direction": "zh-en"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-3",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 3 题",
+          "originalNumber": "3"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "朋友",
+          "english": "friend",
+          "direction": "zh-en"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-4",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 4 题",
+          "originalNumber": "4"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "绿色",
+          "english": "green",
+          "direction": "zh-en"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-5",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 5 题",
+          "originalNumber": "5"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "星期三",
+          "english": "Wednesday",
+          "direction": "zh-en"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-6",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 6 题",
+          "originalNumber": "6"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "家庭",
+          "english": "family",
+          "direction": "zh-en"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-7",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 7 题",
+          "originalNumber": "7"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "图书馆",
+          "english": "library",
+          "direction": "zh-en"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-8",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 8 题",
+          "originalNumber": "8"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "漂亮的",
+          "english": "beautiful",
+          "direction": "zh-en"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-9",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 9 题",
+          "originalNumber": "9"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "踢足球",
+          "english": "play football",
+          "direction": "en-zh"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-10",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 10 题",
+          "originalNumber": "10"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "在早上",
+          "english": "in the morning",
+          "direction": "en-zh"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-11",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 11 题",
+          "originalNumber": "11"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "照相",
+          "english": "take photos",
+          "direction": "en-zh"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-12",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 12 题",
+          "originalNumber": "12"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "dictation",
+          "chinese": "一杯水",
+          "english": "a glass of water",
+          "direction": "en-zh"
+        }
+      ],
+      "keyCharacters": []
+    },
+    {
+      "id": "english-13",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 13 题",
+          "originalNumber": "13"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Fill in: She ____ (go) to school every day."
+        }
+      ],
+      "keyCharacters": [
+        "Fill in: She ____ (go) to school every day."
+      ]
+    },
+    {
+      "id": "english-14",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 14 题",
+          "originalNumber": "14"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Choose: There ____ two books on the desk. A. is  B. are"
+        }
+      ],
+      "keyCharacters": [
+        "Choose: There ____ two books on the desk. A. is  B. are"
+      ]
+    },
+    {
+      "id": "english-15",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 15 题",
+          "originalNumber": "15"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Write the plural form: child → __________"
+        }
+      ],
+      "keyCharacters": [
+        "Write the plural form: child → __________"
+      ]
+    },
+    {
+      "id": "english-16",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 16 题",
+          "originalNumber": "16"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Put in order: you / are / how / ?"
+        }
+      ],
+      "keyCharacters": [
+        "Put in order: you / are / how / ?"
+      ]
+    },
+    {
+      "id": "english-17",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 17 题",
+          "originalNumber": "17"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Translate into Chinese: Please open the window."
+        }
+      ],
+      "keyCharacters": [
+        "Translate into Chinese: Please open the window."
+      ]
+    },
+    {
+      "id": "english-18",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 18 题",
+          "originalNumber": "18"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Complete: I like apples, ____ I do not like pears."
+        }
+      ],
+      "keyCharacters": [
+        "Complete: I like apples, ____ I do not like pears."
+      ]
+    },
+    {
+      "id": "english-19",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 19 题",
+          "originalNumber": "19"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Tom has a small garden. He plants flowers with his mother every Sunday. The flowers are red and yellow."
+        },
+        {
+          "type": "subquestion",
+          "label": "(1) When does Tom plant flowers?",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Answer in a complete sentence."
+            }
+          ],
+          "workspace": {
+            "mm": 24
+          }
+        },
+        {
+          "type": "subquestion",
+          "label": "(2) What colours are the flowers?",
+          "blocks": [
+            {
+              "type": "text",
+              "text": "Write your answer."
+            }
+          ],
+          "workspace": {
+            "mm": 24
+          }
+        }
+      ],
+      "keyCharacters": [
+        "Tom has a small garden. He plants flowers with his mother every Sunday. The flowers are red and yellow."
+      ]
+    },
+    {
+      "id": "english-20",
+      "subject": "english",
+      "sourceRefs": [
+        {
+          "sourceId": "S3",
+          "location": "第 20 题",
+          "originalNumber": "20"
+        }
+      ],
+      "blocks": [
+        {
+          "type": "text",
+          "text": "Which sentence is correct?"
+        },
+        {
+          "type": "options",
+          "items": [
+            "A. He have a book.",
+            "B. He has a book.",
+            "C. He having a book."
+          ]
+        }
+      ],
+      "keyCharacters": [
+        "Which sentence is correct?"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "错题打印助手"
+  short_description: "整理三科错题，校对疑点，预览并导出 A3/A4 练习 PDF"
+  default_prompt: "用 $mistake-workbook 将我提供的错题整理为可打印练习，确认必要疑点后生成预览和 PDF。"

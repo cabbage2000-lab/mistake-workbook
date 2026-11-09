@@ -1,0 +1,25 @@
+node_modules/
+dist/
+output/
+coverage/
+playwright-report/
+test-results/
+
+# Local credentials and environment overrides
+.env
+.env.*
+!.env.example
+.npmrc
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+._*
+Thumbs.db
+*.tmp
+*.log

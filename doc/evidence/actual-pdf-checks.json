@@ -1,0 +1,124 @@
+[
+  {
+    "kind": "student",
+    "paper": "A4",
+    "pdf": "output/release-samples/math-A4/exports/r0001-757e5c48/数学错题重做-A4-2026-11-09-r1-学生卷.pdf",
+    "pages": 6,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 90,
+      "Type0": 1
+    }
+  },
+  {
+    "kind": "answers",
+    "paper": "A4",
+    "pdf": "output/release-samples/math-A4/exports/r0001-757e5c48/数学错题重做-A4-2026-11-09-r1-答案册.pdf",
+    "pages": 2,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 29
+    }
+  },
+  {
+    "kind": "student",
+    "paper": "A3",
+    "pdf": "output/release-samples/math-A3/exports/r0001-fd9e9158/数学错题重做-A3-2026-11-09-r1-学生卷.pdf",
+    "pages": 4,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 90,
+      "Type0": 1
+    }
+  },
+  {
+    "kind": "answers",
+    "paper": "A3",
+    "pdf": "output/release-samples/math-A3/exports/r0001-fd9e9158/数学错题重做-A3-2026-11-09-r1-答案册.pdf",
+    "pages": 2,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 29
+    }
+  },
+  {
+    "kind": "student",
+    "paper": "A4",
+    "pdf": "output/release-samples/chinese-A4/exports/r0001-4b04b8be/语文错题重做-A4-2026-11-09-r1-学生卷.pdf",
+    "pages": 7,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 121
+    }
+  },
+  {
+    "kind": "answers",
+    "paper": "A4",
+    "pdf": "output/release-samples/chinese-A4/exports/r0001-4b04b8be/语文错题重做-A4-2026-11-09-r1-答案册.pdf",
+    "pages": 2,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 41
+    }
+  },
+  {
+    "kind": "student",
+    "paper": "A3",
+    "pdf": "output/release-samples/chinese-A3/exports/r0001-c5ab21c1/语文错题重做-A3-2026-11-09-r1-学生卷.pdf",
+    "pages": 4,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 121
+    }
+  },
+  {
+    "kind": "answers",
+    "paper": "A3",
+    "pdf": "output/release-samples/chinese-A3/exports/r0001-c5ab21c1/语文错题重做-A3-2026-11-09-r1-答案册.pdf",
+    "pages": 2,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 41
+    }
+  },
+  {
+    "kind": "student",
+    "paper": "A4",
+    "pdf": "output/release-samples/english-A4/exports/r0001-6a9a36e2/英语错题重做-A4-2026-11-09-r1-学生卷.pdf",
+    "pages": 4,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 48
+    }
+  },
+  {
+    "kind": "answers",
+    "paper": "A4",
+    "pdf": "output/release-samples/english-A4/exports/r0001-6a9a36e2/英语错题重做-A4-2026-11-09-r1-答案册.pdf",
+    "pages": 2,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 37
+    }
+  },
+  {
+    "kind": "student",
+    "paper": "A3",
+    "pdf": "output/release-samples/english-A3/exports/r0001-ad52f2d6/英语错题重做-A3-2026-11-09-r1-学生卷.pdf",
+    "pages": 2,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 48
+    }
+  },
+  {
+    "kind": "answers",
+    "paper": "A3",
+    "pdf": "output/release-samples/english-A3/exports/r0001-ad52f2d6/英语错题重做-A3-2026-11-09-r1-答案册.pdf",
+    "pages": 2,
+    "selfContainedFonts": true,
+    "fontTypes": {
+      "Type3": 37
+    }
+  }
+]

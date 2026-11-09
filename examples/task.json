@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "id": "example-text",
+  "title": "数学错题重做",
+  "date": "2026-11-09",
+  "request": "",
+  "revision": 1,
+  "stage": "layout",
+  "sources": [
+    {
+      "id": "S1",
+      "type": "text",
+      "label": "数学原始文本",
+      "status": "complete",
+      "coverage": "checked",
+      "scopeConfirmed": true,
+      "candidateCount": 6,
+      "text": "28 + 37 = ______\n90 − 46 = ______\n7 × 8 = ______\n64 ÷ 8 = ______\n3.6 + 0.45 = ______\n2.5 × 4 = ______"
+    }
+  ],
+  "questions": [
+    {
+      "id": "math-1",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 1 题",
+          "originalNumber": "1"
+        }
+      ],
+      "subject": "math",
+      "type": "oral",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "28 + 37 = ______"
+        }
+      ],
+      "selected": true,
+      "confirmation": "confirmed",
+      "issues": [],
+      "answer": {
+        "text": "65",
+        "verified": true,
+        "provenance": "确定性计算器",
+        "expression": "28 + 37"
+      },
+      "editedByUser": false,
+      "version": 1
+    },
+    {
+      "id": "math-2",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 2 题",
+          "originalNumber": "2"
+        }
+      ],
+      "subject": "math",
+      "type": "oral",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "90 − 46 = ______"
+        }
+      ],
+      "selected": true,
+      "confirmation": "confirmed",
+      "issues": [],
+      "answer": {
+        "text": "44",
+        "verified": true,
+        "provenance": "确定性计算器",
+        "expression": "90 − 46"
+      },
+      "editedByUser": false,
+      "version": 1
+    },
+    {
+      "id": "math-3",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 3 题",
+          "originalNumber": "3"
+        }
+      ],
+      "subject": "math",
+      "type": "oral",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "7 × 8 = ______"
+        }
+      ],
+      "selected": true,
+      "confirmation": "confirmed",
+      "issues": [],
+      "answer": {
+        "text": "56",
+        "verified": true,
+        "provenance": "确定性计算器",
+        "expression": "7 × 8"
+      },
+      "editedByUser": false,
+      "version": 1
+    },
+    {
+      "id": "math-4",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 4 题",
+          "originalNumber": "4"
+        }
+      ],
+      "subject": "math",
+      "type": "oral",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "64 ÷ 8 = ______"
+        }
+      ],
+      "selected": true,
+      "confirmation": "confirmed",
+      "issues": [],
+      "answer": {
+        "text": "8",
+        "verified": true,
+        "provenance": "确定性计算器",
+        "expression": "64 ÷ 8"
+      },
+      "editedByUser": false,
+      "version": 1
+    },
+    {
+      "id": "math-5",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 5 题",
+          "originalNumber": "5"
+        }
+      ],
+      "subject": "math",
+      "type": "oral",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "3.6 + 0.45 = ______"
+        }
+      ],
+      "selected": true,
+      "confirmation": "confirmed",
+      "issues": [],
+      "answer": {
+        "text": "4.05",
+        "verified": true,
+        "provenance": "确定性计算器",
+        "expression": "3.6 + 0.45"
+      },
+      "editedByUser": false,
+      "version": 1
+    },
+    {
+      "id": "math-6",
+      "sourceRefs": [
+        {
+          "sourceId": "S1",
+          "location": "第 6 题",
+          "originalNumber": "6"
+        }
+      ],
+      "subject": "math",
+      "type": "oral",
+      "blocks": [
+        {
+          "type": "text",
+          "text": "2.5 × 4 = ______"
+        }
+      ],
+      "selected": true,
+      "confirmation": "confirmed",
+      "issues": [],
+      "answer": {
+        "text": "10",
+        "verified": true,
+        "provenance": "确定性计算器",
+        "expression": "2.5 × 4"
+      },
+      "editedByUser": false,
+      "version": 1
+    }
+  ],
+  "layout": {
+    "paperSize": "A4",
+    "paperReason": "explicit",
+    "preset": "standard",
+    "fontPt": 14,
+    "marginMm": 14,
+    "columns": "auto",
+    "cellMm": 11
+  },
+  "conflicts": [],
+  "timings": []
+}

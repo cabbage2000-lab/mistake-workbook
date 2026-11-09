@@ -1,0 +1,11 @@
+* text=auto eol=lf
+# Preserve Markdown hard breaks and the upstream font license verbatim.
+*.md whitespace=-blank-at-eol
+assets/fonts/OFL.txt whitespace=-blank-at-eol
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.woff2 binary
+*.pdf binary
+*.zip binary

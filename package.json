@@ -1,0 +1,44 @@
+{
+  "name": "mistake-workbook",
+  "version": "1.0.0",
+  "private": true,
+  "description": "错题打印助手：可恢复的 A3/A4 三科练习 skill",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "workbook": "node --import tsx scripts/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test tests/model.test.ts",
+    "test:integration": "node --import tsx --test --test-concurrency=1 tests/integration.test.ts",
+    "test:all": "npm run typecheck && npm test && npm run test:integration",
+    "test:install": "node --import tsx scripts/install-smoke.ts",
+    "samples": "node --import tsx scripts/samples.ts",
+    "package": "node --import tsx scripts/package.ts"
+  },
+  "dependencies": {
+    "@chenglou/pretext": "1.0.0",
+    "esbuild": "0.25.12",
+    "katex": "0.18.2",
+    "pdf-lib": "1.17.1",
+    "playwright": "1.56.1",
+    "sharp": "0.35.5",
+    "tsx": "4.20.6",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/katex": "0.16.7",
+    "@types/node": "22.19.0",
+    "typescript": "5.9.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cabbage2000-lab/mistake-workbook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cabbage2000-lab/mistake-workbook/issues"
+  },
+  "homepage": "https://github.com/cabbage2000-lab/mistake-workbook#readme"
+}

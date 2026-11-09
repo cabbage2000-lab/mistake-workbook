@@ -1,0 +1,195 @@
+[
+  {
+    "sample": "math-A4",
+    "kind": "student",
+    "pages": 7,
+    "sectionHeadings": [
+      "一、填空题",
+      "二、选择题",
+      "三、口算题",
+      "四、竖式计算",
+      "四、竖式计算（续）",
+      "五、脱式计算",
+      "五、脱式计算（续）",
+      "六、解决问题",
+      "六、解决问题（续）",
+      "六、解决问题（续）",
+      "七、图表与材料题"
+    ],
+    "pdf": "output/exam-by-type/math-A4/exports/r0001-ba2a15bb/数学错题重做-A4-2026-11-09-r1-学生卷.pdf"
+  },
+  {
+    "sample": "math-A4",
+    "kind": "answers",
+    "pages": 3,
+    "sectionHeadings": [
+      "一、填空题",
+      "二、选择题",
+      "三、口算题",
+      "三、口算题（续）",
+      "四、竖式计算",
+      "五、脱式计算",
+      "六、解决问题",
+      "六、解决问题（续）",
+      "七、图表与材料题"
+    ],
+    "pdf": "output/exam-by-type/math-A4/exports/r0001-ba2a15bb/数学错题重做-A4-2026-11-09-r1-答案册.pdf"
+  },
+  {
+    "sample": "math-A3",
+    "kind": "student",
+    "pages": 4,
+    "sectionHeadings": [
+      "一、填空题",
+      "二、选择题",
+      "三、口算题",
+      "四、竖式计算",
+      "五、脱式计算",
+      "六、解决问题",
+      "六、解决问题（续）",
+      "七、图表与材料题"
+    ],
+    "pdf": "output/exam-by-type/math-A3/exports/r0001-2c1e9953/数学错题重做-A3-2026-11-09-r1-学生卷.pdf"
+  },
+  {
+    "sample": "math-A3",
+    "kind": "answers",
+    "pages": 2,
+    "sectionHeadings": [
+      "一、填空题",
+      "二、选择题",
+      "三、口算题",
+      "四、竖式计算",
+      "五、脱式计算",
+      "六、解决问题",
+      "七、图表与材料题"
+    ],
+    "pdf": "output/exam-by-type/math-A3/exports/r0001-2c1e9953/数学错题重做-A3-2026-11-09-r1-答案册.pdf"
+  },
+  {
+    "sample": "chinese-A4",
+    "kind": "student",
+    "pages": 8,
+    "sectionHeadings": [
+      "一、看拼音写词语",
+      "二、词语抄写",
+      "二、词语抄写（续）",
+      "三、选择题",
+      "四、判断题",
+      "五、填空题",
+      "六、综合题",
+      "七、阅读理解",
+      "七、阅读理解（续）",
+      "七、阅读理解（续）",
+      "七、阅读理解（续）",
+      "七、阅读理解（续）"
+    ],
+    "pdf": "output/exam-by-type/chinese-A4/exports/r0001-abaec8f4/语文错题重做-A4-2026-11-09-r1-学生卷.pdf"
+  },
+  {
+    "sample": "chinese-A4",
+    "kind": "answers",
+    "pages": 3,
+    "sectionHeadings": [
+      "一、看拼音写词语",
+      "二、词语抄写",
+      "二、词语抄写（续）",
+      "三、选择题",
+      "四、判断题",
+      "五、填空题",
+      "六、综合题",
+      "七、阅读理解"
+    ],
+    "pdf": "output/exam-by-type/chinese-A4/exports/r0001-abaec8f4/语文错题重做-A4-2026-11-09-r1-答案册.pdf"
+  },
+  {
+    "sample": "chinese-A3",
+    "kind": "student",
+    "pages": 5,
+    "sectionHeadings": [
+      "一、看拼音写词语",
+      "二、词语抄写",
+      "三、选择题",
+      "四、判断题",
+      "五、填空题",
+      "六、综合题",
+      "七、阅读理解",
+      "七、阅读理解（续）",
+      "七、阅读理解（续）"
+    ],
+    "pdf": "output/exam-by-type/chinese-A3/exports/r0001-ef0bd9bf/语文错题重做-A3-2026-11-09-r1-学生卷.pdf"
+  },
+  {
+    "sample": "chinese-A3",
+    "kind": "answers",
+    "pages": 2,
+    "sectionHeadings": [
+      "一、看拼音写词语",
+      "二、词语抄写",
+      "三、选择题",
+      "四、判断题",
+      "五、填空题",
+      "六、综合题",
+      "七、阅读理解"
+    ],
+    "pdf": "output/exam-by-type/chinese-A3/exports/r0001-ef0bd9bf/语文错题重做-A3-2026-11-09-r1-答案册.pdf"
+  },
+  {
+    "sample": "english-A4",
+    "kind": "student",
+    "pages": 3,
+    "sectionHeadings": [
+      "一、中译英",
+      "二、英译中",
+      "二、英译中（续）",
+      "三、选择题",
+      "四、填空题",
+      "五、综合题",
+      "六、阅读理解"
+    ],
+    "pdf": "output/exam-by-type/english-A4/exports/r0001-30dbee76/英语错题重做-A4-2026-11-09-r1-学生卷.pdf"
+  },
+  {
+    "sample": "english-A4",
+    "kind": "answers",
+    "pages": 3,
+    "sectionHeadings": [
+      "一、中译英",
+      "二、英译中",
+      "二、英译中（续）",
+      "三、选择题",
+      "四、填空题",
+      "五、综合题",
+      "六、阅读理解"
+    ],
+    "pdf": "output/exam-by-type/english-A4/exports/r0001-30dbee76/英语错题重做-A4-2026-11-09-r1-答案册.pdf"
+  },
+  {
+    "sample": "english-A3",
+    "kind": "student",
+    "pages": 2,
+    "sectionHeadings": [
+      "一、中译英",
+      "二、英译中",
+      "三、选择题",
+      "四、填空题",
+      "五、综合题",
+      "六、阅读理解"
+    ],
+    "pdf": "output/exam-by-type/english-A3/exports/r0001-1b7e6f1e/英语错题重做-A3-2026-11-09-r1-学生卷.pdf"
+  },
+  {
+    "sample": "english-A3",
+    "kind": "answers",
+    "pages": 2,
+    "sectionHeadings": [
+      "一、中译英",
+      "二、英译中",
+      "三、选择题",
+      "四、填空题",
+      "五、综合题",
+      "六、阅读理解"
+    ],
+    "pdf": "output/exam-by-type/english-A3/exports/r0001-1b7e6f1e/英语错题重做-A3-2026-11-09-r1-答案册.pdf"
+  }
+]
