@@ -10,13 +10,15 @@
   },
   "scripts": {
     "workbook": "node --import tsx scripts/cli.ts",
+    "setup:font": "node --import tsx scripts/setup-font.ts",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test tests/model.test.ts",
     "test:integration": "node --import tsx --test --test-concurrency=1 tests/integration.test.ts",
     "test:all": "npm run typecheck && npm test && npm run test:integration",
     "test:install": "node --import tsx scripts/install-smoke.ts",
     "samples": "node --import tsx scripts/samples.ts",
-    "package": "node --import tsx scripts/package.ts"
+    "package": "node --import tsx scripts/package.ts",
+    "package:workbuddy": "node --import tsx scripts/package.ts --workbuddy"
   },
   "dependencies": {
     "@chenglou/pretext": "1.0.0",

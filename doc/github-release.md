@@ -1,6 +1,6 @@
 # GitHub 公开发布准备
 
-公开源码仓库：[cabbage2000-lab/mistake-workbook](https://github.com/cabbage2000-lab/mistake-workbook)。WorkBuddy、Codex、Claude Code 共用一份技能包。本页保留首次发布前的验证记录，并提供后续上传与 Release 的操作步骤。
+公开源码仓库：[cabbage2000-lab/mistake-workbook](https://github.com/cabbage2000-lab/mistake-workbook)。WorkBuddy、Codex、Claude Code 共用一份技能源码，发布完整包与 WorkBuddy 轻量包。本页保留首次发布前的验证记录，并提供后续上传与 Release 的操作步骤。
 
 ## 已准备的内容
 
@@ -11,6 +11,7 @@
 - 依赖锁文件的下载地址统一为官方 npm registry，独立安装验证固定使用该 registry 的本地缓存。
 - 保留 MIT 许可、上游版权、中文字体 OFL 及第三方来源说明。
 - `npm run package` 生成技能 ZIP 和 SHA-256 校验文件，并排除打包目录中的隐藏文件、临时文件、日志和符号链接。
+- `npm run package:workbuddy` 生成 `dist/mistake-workbook-workbuddy.zip`，不含大字体文件，强制小于 3,000,000 字节，并在包内 `SKILL.md` 注入开放平台要求的中英文展示名、简介、版本和作者。首次使用通过 `npm run setup:font` 下载并校验固定字体；完整包仍自带字体。平台格式见 [WorkBuddy 开放平台](https://open.workbuddy.cn/docs/skill)。
 - `.github/workflows/ci.yml` 在 Node.js 22、24 上执行依赖审计、类型检查、单元测试、浏览器/PDF 测试、打包及独立安装验证；使用固定提交版本的官方 Actions 和只读仓库权限。
 
 依赖审计发现的公告已通过升级处理：KaTeX `0.18.2`、sharp `0.35.5`、Zod `4.6.7`。Zod 4 的布局默认值解析采用 `prefault` 保持原行为，并补充回归用例。公告依据：[KaTeX](https://github.com/KaTeX/KaTeX/security/advisories/GHSA-238p-pmpm-9mq7)、[sharp](https://github.com/lovell/sharp/security/advisories/GHSA-wq5f-xc86-pv6w)、[Zod](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)；依赖审计不等同于完整代码安全审计。
@@ -40,16 +41,18 @@ npx playwright install chromium
 npm audit
 npm run test:all
 npm run package
+npm run package:workbuddy
 npm run test:install
+npm run test:install -- --workbuddy
 ```
 
-Linux 的浏览器环境可用 `npx playwright install --with-deps chromium` 准备。安装验证在临时目录运行；`npm ci --offline` 需要此前缓存依赖，报告写入被忽略的 `output/install-smoke.json`。
+CI 固定 Ubuntu 24.04 以匹配锁定的 Playwright 版本；Linux 的浏览器环境可用 `npx playwright install --with-deps chromium` 准备。安装验证在临时目录运行；`npm ci --offline` 需要此前缓存依赖，WorkBuddy 验证额外联网下载字体。报告保存在各自临时目录的 `install-smoke.json` 并打印到终端，不在 `output/` 增加历史记录。
 
 校验安装包（macOS / Linux）：
 
 ```sh
 cd dist
-shasum -a 256 -c mistake-workbook.zip.sha256
+shasum -a 256 -c mistake-workbook*.zip.sha256
 cd ..
 ```
 
@@ -101,6 +104,6 @@ git push origin main
 
 ## 可选：发布可下载的技能包
 
-首次源码上传后，确认 CI 成功，再发布与 `package.json` 版本一致的标签及 GitHub Release。将同一轮验证生成的 `dist/mistake-workbook.zip` 和 `dist/mistake-workbook.zip.sha256` 一起作为 Release 附件，ZIP 不必提交进 Git 历史。避免发布旧包或只更新校验文件。
+首次源码上传后，确认 CI 成功，再发布与 `package.json` 版本一致的标签及 GitHub Release。将同一轮验证生成的完整包、WorkBuddy 轻量包及各自 `.sha256` 文件一起作为 Release 附件，ZIP 不必提交进 Git 历史。WorkBuddy 开放平台上传轻量包 `dist/mistake-workbook-workbuddy.zip`；本地校验不能替代开放平台实际解析与审核。避免发布旧包或只更新校验文件。
 
 CI 所用官方 Actions 文档：[checkout](https://github.com/actions/checkout)、[setup-node](https://github.com/actions/setup-node)、[upload-artifact](https://github.com/actions/upload-artifact)。

@@ -12,4 +12,4 @@
 | sharp | https://github.com/lovell/sharp · Apache-2.0（原生依赖另见对应 npm 包许可） |
 | esbuild / pdf-lib / tsx / Zod | 各 npm 包所附 MIT 许可 |
 
-精确版本见 package-lock.json。离线 HTML 附带中文字体、KaTeX、Pretext 与复用源码许可文本。中文字体 SHA-256：`06f2b103c174d580ba48c69fc7dcbb63b002cce5ce82ea15a05ad0baa4d2ec5a`。完整包带字体，无首次字体下载依赖；浏览器另行安装。
+精确版本见 package-lock.json。离线 HTML 附带中文字体、KaTeX、Pretext 与复用源码许可文本。中文字体 SHA-256：`06f2b103c174d580ba48c69fc7dcbb63b002cce5ce82ea15a05ad0baa4d2ec5a`。完整包带字体，无首次字体下载依赖；WorkBuddy 轻量包保留 OFL 许可，首次运行 `npm run setup:font` 从[本仓库固定提交](https://github.com/cabbage2000-lab/mistake-workbook/blob/f11eaa945392f7ebe008ec8e5010e3beea1ac9ef/assets/fonts/NotoSansSC.woff2) 下载同一份完整字体，校验上述哈希后保存。两种包的浏览器均另行安装。

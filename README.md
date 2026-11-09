@@ -55,7 +55,14 @@ Inputs are text and JPEG, PNG, or WebP images. The host must convert PDF/Word do
 
 ### Install in WorkBuddy, Codex, or Claude Code
 
-From source, run `npm ci`, then `npm run package` to create `dist/mistake-workbook.zip`. You can also use an existing distribution ZIP. Keep the complete skill folder, including `scripts/`, `assets/`, `references/`, and the dependency manifests.
+From source, run `npm ci`, then choose a distribution:
+
+| Distribution | Build command | ZIP to use |
+| --- | --- | --- |
+| WorkBuddy Open Platform (under 3 MB) | `npm run package:workbuddy` | `dist/mistake-workbook-workbuddy.zip` |
+| Full package with the Chinese font | `npm run package` | `dist/mistake-workbook.zip` |
+
+Upload **`mistake-workbook-workbuddy.zip`** to the WorkBuddy Open Platform. It omits the large Chinese font and adds the required bilingual marketplace metadata; the build fails if the ZIP reaches 3,000,000 bytes. On first use, `npm run setup:font` downloads the same complete font from a pinned GitHub commit and verifies its SHA-256. This requires network access once; subsequent runs use the local font. The full package includes the font and works with all three hosts. Keep the complete extracted folder, including `scripts/`, `assets/`, `references/`, and the dependency manifests. See the [WorkBuddy Open Platform format](https://open.workbuddy.cn/docs/skill).
 
 | Host | Installation / final location | Invocation |
 | --- | --- | --- |
@@ -92,10 +99,13 @@ Run in the project root or the extracted `mistake-workbook/` directory:
 
 ```sh
 npm ci
+npm run setup:font
 npx playwright install chromium
 ```
 
-Initial dependency and browser installation requires network access. Chinese fonts, formula fonts, and licenses are supplied with the package or its dependencies. Generated HTML and PDFs can be read offline.
+Initial dependency and browser installation requires network access. The full package includes the Chinese font; the WorkBuddy package downloads it during setup. `setup:font` verifies an existing font without downloading it again. If GitHub is unavailable, copy `assets/fonts/NotoSansSC.woff2` from the full package, then rerun setup. Font licenses are included in both packages, and formula fonts come with dependencies. Generated HTML and PDFs embed their fonts and can be read offline.
+
+When a proxy environment variable such as `HTTPS_PROXY` or `https_proxy` is set, font setup uses system `curl` to honor it; otherwise it uses Node's built-in downloader.
 
 Browser selection uses `MISTAKE_WORKBOOK_CHROME` first, then Playwright's bundled Chromium, then recognized system Chrome/Chromium paths. To use an existing browser, set its executable path, for example on macOS:
 
@@ -103,7 +113,7 @@ Browser selection uses `MISTAKE_WORKBOOK_CHROME` first, then Playwright's bundle
 export MISTAKE_WORKBOOK_CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ```
 
-`doctor` checks directory write access, the bundled Chinese font, and browser PDF support, and reports Node and browser versions. Verify the host's image-reading capability with an actual attachment.
+`doctor` checks directory write access, the installed Chinese font, and browser PDF support, and reports Node and browser versions. Verify the host's image-reading capability with an actual attachment.
 
 ## Use through conversation
 
@@ -260,16 +270,18 @@ npm run test:integration   # Browser, pagination, interaction, and PDF tests
 # Or run npm run test:all to execute all three in sequence
 
 npm run package            # Create the ZIP and its .sha256 checksum
+npm run package:workbuddy  # Create the upload ZIP, strictly under 3 MB
 npm run test:install       # Verify the new ZIP in an isolated directory
+npm run test:install -- --workbuddy  # Test font download and the lightweight ZIP
 ```
 
 Unit/state tests cover sources, confirmation, merging and splitting, section numbering, answer projection, concurrent revisions, and recovery. Browser tests cover A3/A4 PDFs, question completeness, physical dimensions, continuation pages, mobile/desktop interaction, missing assets, page limits, and stale results.
 
-`test:integration` and `test:install` need a working browser. `test:install` also needs `unzip` and installs offline from the official npm registry's cache. Before the first run, use `npm ci --registry=https://registry.npmjs.org` to populate that cache. It extracts into a temporary directory and writes a report with relative paths to `output/install-smoke.json`. Run `package` before installation testing so the archive matches the source.
+`test:integration` and `test:install` need a working browser. `test:install` also needs `unzip` and installs dependencies offline from the official npm registry's cache. Before the first run, use `npm ci --registry=https://registry.npmjs.org` to populate that cache. The `--workbuddy` test additionally needs network access to download the pinned font. Both tests extract and save `install-smoke.json` in a temporary directory, and print the report to the terminal. Build the corresponding package before installation testing so the archive matches the source.
 
-The distribution includes both READMEs, skill instructions, source code, fonts, examples, tests, and acceptance documentation. It excludes `node_modules/` and `output/`. Users still need to install dependencies and prepare a browser.
+Both distributions include the READMEs, skill instructions, source code, font licenses, examples, tests, and acceptance documentation. The full distribution also includes the Chinese font. Both exclude `node_modules/` and `output/`. Users still need to prepare dependencies, the font, and a browser as described above.
 
-GitHub Actions checks dependencies, types, unit/browser tests, packaging, and isolated installation on Node.js 22 and 24. It retains the ZIP and checksum as build artifacts; confirm the actual remote CI result after the first upload. See [GitHub publishing preparation](doc/github-release.md). `private:true` in `package.json` prevents accidental npm publication and does not affect a public GitHub repository or ZIP distribution.
+GitHub Actions checks dependencies, types, unit/browser tests, both packages, and isolated installations on Node.js 22 and 24. It retains both ZIPs and checksums as build artifacts; check the CI badge for the latest remote result. See [GitHub publishing preparation](doc/github-release.md). `private:true` in `package.json` prevents accidental npm publication and does not affect a public GitHub repository or ZIP distribution.
 
 Historical results and evidence are in the [acceptance records](doc/acceptance.md). Samples contain original synthetic material, not real student information. Paper printing, parent completion times, and real attachment transcription accuracy still require manual validation.
 
@@ -277,12 +289,13 @@ Historical results and evidence are in the [acceptance records](doc/acceptance.m
 
 | Symptom | What to do |
 | --- | --- |
+| WorkBuddy rejects the ZIP because it exceeds 3 MB | Run `npm run package:workbuddy` and upload `dist/mistake-workbook-workbuddy.zip` |
 | Host cannot find the skill | Check the installation location and `mistake-workbook/SKILL.md` nesting. Confirm the skill is enabled in WorkBuddy or visible in the Codex / Claude Code skill or command list; reopen the session if needed |
 | Browser fails to launch | Run `npx playwright install chromium`, or check the executable in `MISTAKE_WORKBOOK_CHROME`, then run `doctor` |
 | Task directory already exists | Resume with `status`, edit with `apply`, or choose a different directory for a new task |
 | Final export is blocked | Run `validate` and resolve `problems`, including source scope, pending questions, uncertainties, and images. Use `preview --draft` to inspect unresolved content |
 | Revision conflict or `stale:true` | Read `status`, merge against the current revision, and export again |
-| Missing image, missing font, or font validation failure | Restore task images or packaged fonts. Images must use paths relative to the task directory. Retry export |
+| Missing image, missing font, or font validation failure | Restore task images; for a missing font, run `npm run setup:font`. Restore a damaged font from the full package. Images must use paths relative to the task directory. Retry export |
 | Content does not fit or exceeds the page limit | Split long content at logical boundaries; adjust columns, paper size, or the page limit while preserving readable text and adequate writing space |
 | Another operation is writing the task | Wait for it to finish. After an unexpected exit, verify no writing/generation process remains before handling `.task.lock` |
 | Offline installation cache miss | Run `npm ci --registry=https://registry.npmjs.org` online, then retry `npm run test:install` |

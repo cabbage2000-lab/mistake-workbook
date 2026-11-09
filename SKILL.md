@@ -9,7 +9,7 @@ description: 将家长提供的数学、语文、英语错题文字、照片或�
 
 ## 准备与恢复
 
-以本文件所在目录为 `<skill-dir>`，为本次练习选一个可写 `<task-dir>`。首次运行在技能目录执行 `npm ci`；需要 Node.js ≥22.6。字体与许可随包提供，不访问字体服务。运行 `npm --prefix <skill-dir> run workbook -- doctor --task <task-dir>` 检查写入、字体、浏览器和 PDF。缺少浏览器时执行技能目录下的 `npx playwright install chromium`；也可设置 `MISTAKE_WORKBOOK_CHROME`。优先使用锁定 Playwright Chromium；报告记录实际浏览器版本。
+以本文件所在目录为 `<skill-dir>`，为本次练习选一个可写 `<task-dir>`。首次运行在技能目录执行 `npm ci` 和 `npm run setup:font`；需要 Node.js ≥22.6。完整包自带中文字体，初始化只做校验；WorkBuddy 轻量包首次初始化从固定 GitHub 提交下载同一份完整字体，校验 SHA-256 后保存，后续使用本地文件。下载失败时停止生成，检查网络后重试，或从完整包复制 `assets/fonts/NotoSansSC.woff2`，不可替换为系统字体。字体许可始终随包提供，生成的 HTML/PDF 内嵌字体、可离线查看。运行 `npm --prefix <skill-dir> run workbook -- doctor --task <task-dir>` 检查写入、字体、浏览器和 PDF。缺少浏览器时执行技能目录下的 `npx playwright install chromium`；也可设置 `MISTAKE_WORKBOOK_CHROME`。优先使用锁定 Playwright Chromium；报告记录实际浏览器版本。
 
 宿主必须实际能读取用户文字/图片、写文件和运行脚本；doctor 不检测宿主视觉能力。不能读图时指出具体附件，保留可处理部分；不要伪造转录或把 HTML 称作已导出 PDF。
 

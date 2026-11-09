@@ -10,9 +10,9 @@ import { launchBrowser } from './browser.ts';
 import { blockers, paperSizes, type Worksheet, type Block } from './schema.ts';
 import { project, type PublicSheet, type PublicBlock } from './projection.ts';
 import { atomicJson, fingerprint, loadTask, withLock } from './model.ts';
+import { FONT_SHA256 } from './setup-font.ts';
 
 const skillRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const fontHash = '06f2b103c174d580ba48c69fc7dcbb63b002cce5ce82ea15a05ad0baa4d2ec5a';
 export interface LayoutReport { pages: number; questions: number; questionPages: Record<string, number[]>; fontPt: number; paperSize: 'A3' | 'A4'; pretextMeasurements: number; warnings: string[] }
 export interface GenerateOptions { task: string; mode?: 'preview' | 'export'; answers?: boolean; draft?: boolean }
 export interface Artifact { html: string; pdf?: string; thumbnails: string[]; layout: LayoutReport; pdfCheck?: { pages: number; widthPt: number; heightPt: number }; durationMs: number }
@@ -55,7 +55,7 @@ async function resources() {
       readFile(join(skillRoot, 'assets/fonts/OFL.txt'), 'utf8'), readFile(join(skillRoot, 'LICENSE'), 'utf8'),
       readFile(join(skillRoot, 'node_modules/katex/LICENSE'), 'utf8'), readFile(join(skillRoot, 'node_modules/@chenglou/pretext/LICENSE'), 'utf8')
     ]);
-    if (createHash('sha256').update(font).digest('hex') !== fontHash) throw new Error('固定中文字体校验失败，请从完整 skill 包恢复 assets/fonts/NotoSansSC.woff2');
+    if (createHash('sha256').update(font).digest('hex') !== FONT_SHA256) throw new Error('固定中文字体校验失败，请从完整 skill 包恢复 assets/fonts/NotoSansSC.woff2');
     const paths = [...new Set([...katexRaw.matchAll(/url\((fonts\/[^)]+)\)/g)].map(m => m[1]))];
     let katexCss = katexRaw;
     for (const p of paths) {

@@ -55,7 +55,14 @@
 
 ### 安装到 WorkBuddy、Codex 或 Claude Code
 
-从源码先运行 `npm ci`，再运行 `npm run package` 得到 `dist/mistake-workbook.zip`。也可使用已有安装包；三种宿主使用同一份完整包，保留其中的 `scripts/`、`assets/`、`references/` 和依赖清单。
+从源码先运行 `npm ci`，再按使用场景选择安装包：
+
+| 安装包 | 构建命令 | 使用文件 |
+| --- | --- | --- |
+| WorkBuddy 开放平台（小于 3 MB） | `npm run package:workbuddy` | `dist/mistake-workbook-workbuddy.zip` |
+| 自带中文字体的完整包 | `npm run package` | `dist/mistake-workbook.zip` |
+
+上传 WorkBuddy 开放平台请选 **`mistake-workbook-workbuddy.zip`**。该包排除大体积中文字体，并补齐市场要求的中英文展示信息；ZIP 达到 3,000,000 字节时构建会失败。首次使用运行 `npm run setup:font`，从固定 GitHub 提交下载同一份完整字体并校验 SHA-256，需要联网一次；后续使用本地字体。完整包自带字体，三种宿主均可使用。解压后保留整个目录，包括 `scripts/`、`assets/`、`references/` 和依赖清单。格式依据 [WorkBuddy 开放平台说明](https://open.workbuddy.cn/docs/skill)。
 
 | 宿主 | 安装方式 / 最终目录 | 对话调用 |
 | --- | --- | --- |
@@ -92,10 +99,13 @@ cd "$workbook_skills_dir/mistake-workbook"
 
 ```sh
 npm ci
+npm run setup:font
 npx playwright install chromium
 ```
 
-首次安装依赖与浏览器需要网络。中文字体、公式字体和许可随包或依赖提供，生成的 HTML/PDF 可离线查看。
+首次安装依赖与浏览器需要网络。完整包自带中文字体，WorkBuddy 轻量包在初始化时下载；字体已存在时，`setup:font` 只校验、不重复下载。无法访问 GitHub 时，可从完整包复制 `assets/fonts/NotoSansSC.woff2` 后重试初始化。两种包均保留字体许可，公式字体随依赖提供。生成的 HTML/PDF 内嵌字体，可离线查看。
+
+设置了 `HTTPS_PROXY`、`https_proxy` 等代理环境变量时，字体初始化使用系统 `curl` 读取代理配置；否则使用 Node 内置下载器。
 
 浏览器选择顺序为：`MISTAKE_WORKBOOK_CHROME` 指定的可执行文件 → Playwright 自带 Chromium → 脚本识别的系统 Chrome/Chromium 路径。已有浏览器时，可按实际路径设置，例如 macOS：
 
@@ -103,7 +113,7 @@ npx playwright install chromium
 export MISTAKE_WORKBOOK_CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ```
 
-`doctor` 会检查目录写入、随包中文字体和浏览器 PDF 能力，并报告 Node 与浏览器版本；宿主是否能读图需通过实际附件验证。
+`doctor` 会检查目录写入、已安装中文字体和浏览器 PDF 能力，并报告 Node 与浏览器版本；宿主是否能读图需通过实际附件验证。
 
 ## 通过对话使用
 
@@ -260,16 +270,18 @@ npm run test:integration   # 浏览器、分页、交互与 PDF 测试
 # 或使用 npm run test:all 顺序运行上述三项
 
 npm run package            # 生成 ZIP 和同名 .sha256 校验文件
+npm run package:workbuddy  # 生成严格小于 3 MB 的上传包
 npm run test:install       # 验证刚生成的 ZIP 在独立目录安装运行
+npm run test:install -- --workbuddy  # 验证字体下载及轻量包运行
 ```
 
 单元/状态测试覆盖来源、确认、合并拆分、分组编号、答案投影、并发修订与恢复。浏览器测试覆盖 A3/A4 PDF、题目完整对账、实际毫米尺寸、续页、手机/桌面交互、缺资源、限页数与旧结果失效。
 
-`test:integration` 和 `test:install` 需要可启动的浏览器。`test:install` 还需要 `unzip`，内部从官方 npm registry 的缓存执行离线安装；首次验证前运行 `npm ci --registry=https://registry.npmjs.org` 填充对应缓存，避免本机镜像配置造成缓存未命中。它会在临时目录解压运行，并将使用相对路径的报告写入 `output/install-smoke.json`。安装测试前先运行 `package`，确保校验当前源码。
+`test:integration` 和 `test:install` 需要可启动的浏览器。`test:install` 还需要 `unzip`，内部从官方 npm registry 的缓存离线安装依赖；首次验证前运行 `npm ci --registry=https://registry.npmjs.org` 填充对应缓存。`--workbuddy` 测试还需联网下载固定字体。两种安装测试均在临时目录解压运行，将 `install-smoke.json` 保存到该临时目录，并在终端打印报告。安装测试前先构建对应包，确保校验当前源码。
 
-安装包包含中英文 README、技能指引、源码、字体、示例、测试与验收文档，不包含 `node_modules/` 或 `output/`。使用者解压后仍需安装依赖并准备浏览器。
+两种安装包均包含中英文 README、技能指引、源码、字体许可、示例、测试与验收文档；完整包额外包含中文字体文件。均不包含 `node_modules/` 或 `output/`。使用者解压后仍需按上文准备依赖、字体与浏览器。
 
-GitHub Actions 在 Node.js 22、24 上执行依赖审计、类型检查、单元/浏览器测试、打包及独立安装验证。安装包与校验文件作为 Actions 工件保留；首次发布仍需查看远程 CI 实际结果。仓库初始化、公开上传与 Release 操作见 [GitHub 发布准备](doc/github-release.md)。`package.json` 中的 `private:true` 用于防止误发布到 npm，不影响 GitHub 公开仓库或技能 ZIP 分发。
+GitHub Actions 在 Node.js 22、24 上执行依赖审计、类型检查、单元/浏览器测试、两种打包及独立安装验证。两个安装包与校验文件作为 Actions 工件保留；最新远程结果见 CI 徽章。仓库初始化、公开上传与 Release 操作见 [GitHub 发布准备](doc/github-release.md)。`package.json` 中的 `private:true` 用于防止误发布到 npm，不影响 GitHub 公开仓库或技能 ZIP 分发。
 
 历史测试结果及证据见 [验收记录](doc/acceptance.md)，当前样张以本文入口为准。所有样例均为原创合成题型材料，不包含真实学生资料。实际纸质打印、家长耗时和真实附件转录准确率仍需人工验收，自动化测试不替代这些检查。
 
@@ -277,12 +289,13 @@ GitHub Actions 在 Node.js 22、24 上执行依赖审计、类型检查、单元
 
 | 现象 | 处理方式 |
 | --- | --- |
+| WorkBuddy 提示 ZIP 超过 3 MB | 执行 `npm run package:workbuddy`，上传 `dist/mistake-workbook-workbuddy.zip` |
 | 宿主找不到技能 | 核对上表中的安装位置及 `mistake-workbook/SKILL.md` 层级；WorkBuddy 检查技能是否启用，Codex / Claude Code 检查技能列表或命令是否出现，必要时重新打开会话 |
 | 浏览器启动失败 | 执行 `npx playwright install chromium`，或检查 `MISTAKE_WORKBOOK_CHROME` 是否指向可执行文件；再运行 `doctor` |
 | 任务目录已存在 | 用 `status` 恢复、用 `apply` 修改；新建任务换一个目录，不覆盖已有 `task.json` |
 | 正式导出被阻止 | 运行 `validate` 查看 `problems`，核对来源范围、待确认题目、疑点和题图；只看未决内容可用 `preview --draft` |
 | 修订冲突或 `stale:true` | 重新读 `status`，按当前修订合并修改，再重新导出 |
-| 缺图、字体缺失或校验失败 | 恢复任务内题图或安装包中的字体；题图使用任务内相对路径，随后重试导出 |
+| 缺图、字体缺失或校验失败 | 恢复任务内题图；字体缺失时运行 `npm run setup:font`，字体损坏时从完整包恢复；题图使用任务内相对路径，随后重试导出 |
 | 内容放不下或超过限页数 | 按原题逻辑拆分过长内容，调整栏数、纸型或页数上限，保留可读字号与足够书写空间 |
 | 提示任务正由另一操作写入 | 等待运行操作完成；意外退出时先确认没有写入/生成进程，再处理任务中的 `.task.lock` |
 | 安装测试提示离线缓存缺包 | 在可联网环境先运行 `npm ci --registry=https://registry.npmjs.org`，再重试 `npm run test:install` |

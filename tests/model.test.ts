@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, writeFile, mkdir, symlink, readdir } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile, mkdir, symlink, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import sharp from 'sharp';
@@ -11,6 +11,35 @@ import { fixture, writeFixtureAssets } from '../scripts/fixtures.ts';
 import { calculate, solve } from '../scripts/arithmetic.ts';
 import { importImage } from '../scripts/sources.ts';
 import { localResource, generate } from '../scripts/generate.ts';
+import { setupFont, FONT_URL } from '../scripts/setup-font.ts';
+
+test('轻量包下载完整字体并校验，重复初始化不联网',async t=>{
+  const dir=await mkdtemp(join(tmpdir(),'workbook-font-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+  const font=await readFile(new URL('../assets/fonts/NotoSansSC.woff2',import.meta.url));
+  let requests=0;
+  const fetcher:typeof fetch=async url=>{assert.equal(url,FONT_URL);requests++;return new Response(new Uint8Array(font));};
+  assert.equal((await setupFont(dir,fetcher)).downloaded,true);
+  assert.equal((await setupFont(dir,fetcher)).downloaded,false);
+  assert.equal(requests,1);
+  assert.deepEqual(await readFile(join(dir,'assets/fonts/NotoSansSC.woff2')),font);
+});
+test('下载失败或字体校验失败不安装坏文件，可重新初始化',async t=>{
+  const dir=await mkdtemp(join(tmpdir(),'workbook-font-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+  await assert.rejects(setupFont(dir,async()=>new Response('not found',{status:404})),/HTTP 404/);
+  await assert.rejects(setupFont(dir,async()=>new Response('invalid font')),/SHA-256/);
+  await assert.rejects(readFile(join(dir,'assets/fonts/NotoSansSC.woff2')),{code:'ENOENT'});
+  const font=await readFile(new URL('../assets/fonts/NotoSansSC.woff2',import.meta.url));
+  assert.equal((await setupFont(dir,async()=>new Response(new Uint8Array(font)))).downloaded,true);
+});
+test('损坏的已有字体明确报错，不隐式联网或覆盖',async t=>{
+  const dir=await mkdtemp(join(tmpdir(),'workbook-font-'));t.after(()=>rm(dir,{recursive:true,force:true}));
+  await mkdir(join(dir,'assets/fonts'),{recursive:true});
+  await writeFile(join(dir,'assets/fonts/NotoSansSC.woff2'),'invalid font');
+  let requests=0;
+  await assert.rejects(setupFont(dir,async()=>{requests++;throw new Error('unexpected network');}),/校验失败/);
+  assert.equal(requests,0);
+  assert.equal(await readFile(join(dir,'assets/fonts/NotoSansSC.woff2'),'utf8'),'invalid font');
+});
 
 function small() { const w=fixture('math'); w.questions=w.questions.slice(0,2); return w; }
 function apply(w: ReturnType<typeof small>, operations: any[]) { return applyOperations(w,{expectedRevision:w.revision,operations}); }
