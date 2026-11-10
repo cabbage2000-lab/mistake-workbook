@@ -11,7 +11,7 @@
 - 依赖锁文件的下载地址统一为官方 npm registry，独立安装验证固定使用该 registry 的本地缓存。
 - 保留 MIT 许可、上游版权、中文字体 OFL 及第三方来源说明。
 - `npm run package` 生成技能 ZIP 和 SHA-256 校验文件，并排除打包目录中的隐藏文件、临时文件、日志和符号链接。
-- `npm run package:workbuddy` 生成 `dist/mistake-workbook-workbuddy.zip`，不含大字体文件，强制小于 3,000,000 字节，并在包内 `SKILL.md` 注入开放平台要求的中英文展示名、简介、版本和作者。首次使用通过 `npm run setup:font` 下载并校验固定字体；完整包仍自带字体。平台格式见 [WorkBuddy 开放平台](https://open.workbuddy.cn/docs/skill)。
+- `npm run package:workbuddy` 生成 `dist/mistake-workbook-workbuddy.zip`，排除大字体文件、`tests/fixtures/` 和 `doc/evidence/`，强制小于 3,000,000 字节且仅允许“技能根目录/二级目录/文件”，并在包内 `SKILL.md` 注入开放平台要求的中英文展示名、简介、版本和作者。字体许可放在 `assets/OFL.txt`，包内验收证据链接改为 GitHub 地址。首次使用通过 `npm run setup:font` 下载并校验固定字体；完整包仍自带字体及开发证据。平台格式见 [WorkBuddy 开放平台](https://open.workbuddy.cn/docs/skill)。
 - `.github/workflows/ci.yml` 在 Node.js 22、24 上执行依赖审计、类型检查、单元测试、浏览器/PDF 测试、打包及独立安装验证；使用固定提交版本的官方 Actions 和只读仓库权限。
 
 依赖审计发现的公告已通过升级处理：KaTeX `0.18.2`、sharp `0.35.5`、Zod `4.6.7`。Zod 4 的布局默认值解析采用 `prefault` 保持原行为，并补充回归用例。公告依据：[KaTeX](https://github.com/KaTeX/KaTeX/security/advisories/GHSA-238p-pmpm-9mq7)、[sharp](https://github.com/lovell/sharp/security/advisories/GHSA-wq5f-xc86-pv6w)、[Zod](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5)；依赖审计不等同于完整代码安全审计。

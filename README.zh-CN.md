@@ -62,7 +62,7 @@
 | WorkBuddy 开放平台（小于 3 MB） | `npm run package:workbuddy` | `dist/mistake-workbook-workbuddy.zip` |
 | 自带中文字体的完整包 | `npm run package` | `dist/mistake-workbook.zip` |
 
-上传 WorkBuddy 开放平台请选 **`mistake-workbook-workbuddy.zip`**。该包排除大体积中文字体，并补齐市场要求的中英文展示信息；ZIP 达到 3,000,000 字节时构建会失败。首次使用运行 `npm run setup:font`，从固定 GitHub 提交下载同一份完整字体并校验 SHA-256，需要联网一次；后续使用本地字体。完整包自带字体，三种宿主均可使用。解压后保留整个目录，包括 `scripts/`、`assets/`、`references/` 和依赖清单。格式依据 [WorkBuddy 开放平台说明](https://open.workbuddy.cn/docs/skill)。
+上传 WorkBuddy 开放平台请选 **`mistake-workbook-workbuddy.zip`**。该包排除大体积中文字体、`tests/fixtures/` 和 `doc/evidence/`，字体许可直接放在 `assets/OFL.txt`，并补齐市场要求的中英文展示信息；ZIP 达到 3,000,000 字节或超出“技能根目录/二级目录/文件”层级时构建会失败。首次使用运行 `npm run setup:font`，从固定 GitHub 提交下载同一份完整字体并校验 SHA-256，需要联网一次；后续使用本地字体。完整包自带字体，适用于本地目录安装；开放平台上传使用上述轻量包。解压后保留整个目录，包括 `scripts/`、`assets/`、`references/` 和依赖清单。格式依据 [WorkBuddy 开放平台说明](https://open.workbuddy.cn/docs/skill)。
 
 | 宿主 | 安装方式 / 最终目录 | 对话调用 |
 | --- | --- | --- |
@@ -265,7 +265,7 @@ npm run samples -- "$HOME/mistake-workbook-tasks/samples-new"
 
 ```sh
 npm run typecheck          # TypeScript 类型检查
-npm test                   # 数据、状态与修订测试
+npm test                   # 数据、状态、修订与 ZIP 结构测试（源码目录）
 npm run test:integration   # 浏览器、分页、交互与 PDF 测试
 # 或使用 npm run test:all 顺序运行上述三项
 
@@ -277,9 +277,9 @@ npm run test:install -- --workbuddy  # 验证字体下载及轻量包运行
 
 单元/状态测试覆盖来源、确认、合并拆分、分组编号、答案投影、并发修订与恢复。浏览器测试覆盖 A3/A4 PDF、题目完整对账、实际毫米尺寸、续页、手机/桌面交互、缺资源、限页数与旧结果失效。
 
-`test:integration` 和 `test:install` 需要可启动的浏览器。`test:install` 还需要 `unzip`，内部从官方 npm registry 的缓存离线安装依赖；首次验证前运行 `npm ci --registry=https://registry.npmjs.org` 填充对应缓存。`--workbuddy` 测试还需联网下载固定字体。两种安装测试均在临时目录解压运行，将 `install-smoke.json` 保存到该临时目录，并在终端打印报告。安装测试前先构建对应包，确保校验当前源码。
+`test:integration` 和 `test:install` 需要可启动的浏览器。打包回归测试与 `test:install` 需要 `unzip`；安装测试从官方 npm registry 的缓存离线安装依赖，首次验证前运行 `npm ci --registry=https://registry.npmjs.org` 填充对应缓存。`--workbuddy` 测试还需联网下载固定字体。两种安装测试均在临时目录解压运行，将 `install-smoke.json` 保存到该临时目录，并在终端打印报告。安装测试前先构建对应包，确保校验当前源码。
 
-两种安装包均包含中英文 README、技能指引、源码、字体许可、示例、测试与验收文档；完整包额外包含中文字体文件。均不包含 `node_modules/` 或 `output/`。使用者解压后仍需按上文准备依赖、字体与浏览器。
+两种安装包均包含中英文 README、技能指引、源码、字体许可、运行示例、测试脚本与验收文档；完整包额外包含中文字体、嵌套测试素材和验收证据。WorkBuddy 包内文档的验收截图与日志链接指向 GitHub，查看这些历史证据需要联网；练习生成不依赖它们。两种包均不包含 `node_modules/` 或 `output/`。使用者解压后仍需按上文准备依赖、字体与浏览器。打包回归测试在源码目录执行。
 
 GitHub Actions 在 Node.js 22、24 上执行依赖审计、类型检查、单元/浏览器测试、两种打包及独立安装验证。两个安装包与校验文件作为 Actions 工件保留；最新远程结果见 CI 徽章。仓库初始化、公开上传与 Release 操作见 [GitHub 发布准备](doc/github-release.md)。`package.json` 中的 `private:true` 用于防止误发布到 npm，不影响 GitHub 公开仓库或技能 ZIP 分发。
 
@@ -290,6 +290,7 @@ GitHub Actions 在 Node.js 22、24 上执行依赖审计、类型检查、单元
 | 现象 | 处理方式 |
 | --- | --- |
 | WorkBuddy 提示 ZIP 超过 3 MB | 执行 `npm run package:workbuddy`，上传 `dist/mistake-workbook-workbuddy.zip` |
+| WorkBuddy 提示“目录层级超限” | 用当前源码执行 `npm run package:workbuddy`，重新上传生成的轻量包；不要上传完整包或直接压缩源码目录 |
 | 宿主找不到技能 | 核对上表中的安装位置及 `mistake-workbook/SKILL.md` 层级；WorkBuddy 检查技能是否启用，Codex / Claude Code 检查技能列表或命令是否出现，必要时重新打开会话 |
 | 浏览器启动失败 | 执行 `npx playwright install chromium`，或检查 `MISTAKE_WORKBOOK_CHROME` 是否指向可执行文件；再运行 `doctor` |
 | 任务目录已存在 | 用 `status` 恢复、用 `apply` 修改；新建任务换一个目录，不覆盖已有 `task.json` |
@@ -314,7 +315,8 @@ mistake-workbook/
 ├── assets/
 │   ├── worksheet.ts          # 浏览器排版模板
 │   ├── print.css             # 打印与预览样式
-│   └── fonts/                # 中文字体及 OFL 许可
+│   ├── OFL.txt               # 中文字体许可
+│   └── fonts/                # 中文字体（轻量包首次初始化下载）
 ├── doc/                      # 项目文档
 │   ├── PRD.md
 │   ├── acceptance.md

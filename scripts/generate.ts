@@ -52,7 +52,7 @@ async function resources() {
       readFile(join(skillRoot, 'assets/print.css'), 'utf8'),
       readFile(join(skillRoot, 'node_modules/katex/dist/katex.min.css'), 'utf8'),
       build({ entryPoints: [join(skillRoot, 'assets/worksheet.ts')], bundle: true, minify: true, write: false, platform: 'browser', format: 'iife', legalComments: 'inline' }),
-      readFile(join(skillRoot, 'assets/fonts/OFL.txt'), 'utf8'), readFile(join(skillRoot, 'LICENSE'), 'utf8'),
+      readFile(join(skillRoot, 'assets/OFL.txt'), 'utf8'), readFile(join(skillRoot, 'LICENSE'), 'utf8'),
       readFile(join(skillRoot, 'node_modules/katex/LICENSE'), 'utf8'), readFile(join(skillRoot, 'node_modules/@chenglou/pretext/LICENSE'), 'utf8')
     ]);
     if (createHash('sha256').update(font).digest('hex') !== FONT_SHA256) throw new Error('固定中文字体校验失败，请从完整 skill 包恢复 assets/fonts/NotoSansSC.woff2');

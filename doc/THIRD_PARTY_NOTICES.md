@@ -5,7 +5,7 @@
 | 组件 | 来源 / 许可 |
 | --- | --- |
 | study-sheet | https://github.com/cabbage2000-lab/study-sheet · MIT，见 [LICENSE](../LICENSE) |
-| Noto Sans SC | https://github.com/google/fonts/tree/main/ofl/notosanssc · SIL OFL，见 [OFL.txt](../assets/fonts/OFL.txt) |
+| Noto Sans SC | https://github.com/google/fonts/tree/main/ofl/notosanssc · SIL OFL，见 [OFL.txt](../assets/OFL.txt) |
 | Pretext | https://github.com/chenglou/pretext · MIT |
 | KaTeX | https://github.com/KaTeX/KaTeX · MIT |
 | Playwright | https://github.com/microsoft/playwright · Apache-2.0 |

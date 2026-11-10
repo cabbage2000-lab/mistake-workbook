@@ -11,7 +11,13 @@ const {values}=parseArgs({options:{workbuddy:{type:'boolean'}}});
 const target=values.workbuddy?'workbuddy':'full';
 const isolated=await mkdtemp(join(tmpdir(),'mistake-workbook-install-'));
 const archive=join(root,`dist/mistake-workbook${values.workbuddy?'-workbuddy':''}.zip`);
-if(values.workbuddy)assert.ok((await readFile(archive)).length<3_000_000);
+if(values.workbuddy){
+  assert.ok((await readFile(archive)).length<3_000_000);
+  const entries=execFileSync('unzip',['-Z1',archive],{encoding:'utf8'}).trim().split('\n');
+  assert.ok(entries.includes('mistake-workbook/SKILL.md'));
+  assert.ok(entries.includes('mistake-workbook/assets/OFL.txt'));
+  for(const entry of entries)assert.ok(entry.startsWith('mistake-workbook/')&&entry.split('/').length<=3,`目录层级超限：${entry}`);
+}
 execFileSync('unzip',['-q',archive,'-d',isolated]);
 const skill=join(isolated,'mistake-workbook');const task=join(isolated,'work');
 // Offline install proves the lockfile/package are sufficient without a sibling checkout.

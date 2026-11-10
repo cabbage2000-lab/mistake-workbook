@@ -62,7 +62,7 @@ From source, run `npm ci`, then choose a distribution:
 | WorkBuddy Open Platform (under 3 MB) | `npm run package:workbuddy` | `dist/mistake-workbook-workbuddy.zip` |
 | Full package with the Chinese font | `npm run package` | `dist/mistake-workbook.zip` |
 
-Upload **`mistake-workbook-workbuddy.zip`** to the WorkBuddy Open Platform. It omits the large Chinese font and adds the required bilingual marketplace metadata; the build fails if the ZIP reaches 3,000,000 bytes. On first use, `npm run setup:font` downloads the same complete font from a pinned GitHub commit and verifies its SHA-256. This requires network access once; subsequent runs use the local font. The full package includes the font and works with all three hosts. Keep the complete extracted folder, including `scripts/`, `assets/`, `references/`, and the dependency manifests. See the [WorkBuddy Open Platform format](https://open.workbuddy.cn/docs/skill).
+Upload **`mistake-workbook-workbuddy.zip`** to the WorkBuddy Open Platform. It omits the large Chinese font, `tests/fixtures/`, and `doc/evidence/`, keeps the font license directly in `assets/OFL.txt`, and adds the required bilingual marketplace metadata. The build fails if the ZIP reaches 3,000,000 bytes or any file is deeper than `skill-root/subdirectory/file`. On first use, `npm run setup:font` downloads the same complete font from a pinned GitHub commit and verifies its SHA-256. This requires network access once; subsequent runs use the local font. The full package includes the font for local folder installation; use the lightweight package for platform uploads. Keep the complete extracted folder, including `scripts/`, `assets/`, `references/`, and the dependency manifests. See the [WorkBuddy Open Platform format](https://open.workbuddy.cn/docs/skill).
 
 | Host | Installation / final location | Invocation |
 | --- | --- | --- |
@@ -265,7 +265,7 @@ This generates HTML, PDFs, page PNGs, `manifest.json`, and `index.html` for all 
 
 ```sh
 npm run typecheck          # TypeScript checks
-npm test                   # Data, state, and revision tests
+npm test                   # Data, state, revision, and ZIP structure tests (source checkout)
 npm run test:integration   # Browser, pagination, interaction, and PDF tests
 # Or run npm run test:all to execute all three in sequence
 
@@ -277,9 +277,9 @@ npm run test:install -- --workbuddy  # Test font download and the lightweight ZI
 
 Unit/state tests cover sources, confirmation, merging and splitting, section numbering, answer projection, concurrent revisions, and recovery. Browser tests cover A3/A4 PDFs, question completeness, physical dimensions, continuation pages, mobile/desktop interaction, missing assets, page limits, and stale results.
 
-`test:integration` and `test:install` need a working browser. `test:install` also needs `unzip` and installs dependencies offline from the official npm registry's cache. Before the first run, use `npm ci --registry=https://registry.npmjs.org` to populate that cache. The `--workbuddy` test additionally needs network access to download the pinned font. Both tests extract and save `install-smoke.json` in a temporary directory, and print the report to the terminal. Build the corresponding package before installation testing so the archive matches the source.
+`test:integration` and `test:install` need a working browser. Packaging regression tests and `test:install` need `unzip`. Installation tests install dependencies offline from the official npm registry's cache. Before the first run, use `npm ci --registry=https://registry.npmjs.org` to populate that cache. The `--workbuddy` test additionally needs network access to download the pinned font. Both tests extract and save `install-smoke.json` in a temporary directory, and print the report to the terminal. Build the corresponding package before installation testing so the archive matches the source.
 
-Both distributions include the READMEs, skill instructions, source code, font licenses, examples, tests, and acceptance documentation. The full distribution also includes the Chinese font. Both exclude `node_modules/` and `output/`. Users still need to prepare dependencies, the font, and a browser as described above.
+Both distributions include the READMEs, skill instructions, source code, font licenses, runnable examples, test scripts, and acceptance documentation. The full distribution also includes the Chinese font, nested test fixtures, and acceptance evidence. In the WorkBuddy package, links to acceptance screenshots and logs point to GitHub and require network access to view; worksheet generation does not depend on them. Both exclude `node_modules/` and `output/`. Users still need to prepare dependencies, the font, and a browser as described above. Run packaging regression tests from the source checkout.
 
 GitHub Actions checks dependencies, types, unit/browser tests, both packages, and isolated installations on Node.js 22 and 24. It retains both ZIPs and checksums as build artifacts; check the CI badge for the latest remote result. See [GitHub publishing preparation](doc/github-release.md). `private:true` in `package.json` prevents accidental npm publication and does not affect a public GitHub repository or ZIP distribution.
 
@@ -290,6 +290,7 @@ Historical results and evidence are in the [acceptance records](doc/acceptance.m
 | Symptom | What to do |
 | --- | --- |
 | WorkBuddy rejects the ZIP because it exceeds 3 MB | Run `npm run package:workbuddy` and upload `dist/mistake-workbook-workbuddy.zip` |
+| WorkBuddy reports excessive directory depth | Run `npm run package:workbuddy` from the current source and upload the new lightweight ZIP; do not upload the full package or a ZIP of the source tree |
 | Host cannot find the skill | Check the installation location and `mistake-workbook/SKILL.md` nesting. Confirm the skill is enabled in WorkBuddy or visible in the Codex / Claude Code skill or command list; reopen the session if needed |
 | Browser fails to launch | Run `npx playwright install chromium`, or check the executable in `MISTAKE_WORKBOOK_CHROME`, then run `doctor` |
 | Task directory already exists | Resume with `status`, edit with `apply`, or choose a different directory for a new task |
@@ -314,7 +315,8 @@ mistake-workbook/
 ├── assets/
 │   ├── worksheet.ts          # Browser layout template
 │   ├── print.css             # Print and preview styles
-│   └── fonts/                # Chinese font and OFL license
+│   ├── OFL.txt               # Chinese font license
+│   └── fonts/                # Chinese font (downloaded during lightweight package setup)
 ├── doc/                      # Project documentation
 │   ├── PRD.md
 │   ├── acceptance.md
