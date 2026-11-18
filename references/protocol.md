@@ -81,8 +81,9 @@ npm --prefix <skill-dir> run workbook -- status --task <task-dir>
 
 ```sh
 npm --prefix <skill-dir> run workbook -- validate --task <task-dir>
-npm --prefix <skill-dir> run workbook -- preview --task <task-dir>
 npm --prefix <skill-dir> run workbook -- export --task <task-dir> --answers
 ```
 
-每次生成目录 `exports/rNNNN-随机标识/`，包含离线 HTML、正式导出时的 PDF、全部页面 PNG 和 `report.json`。文件名含标题、纸型、日期与修订。报告包含 status、fingerprint、layout.questionPages、页数、字号、减栏/续页提示、PDF 尺寸、耗时、浏览器版本、排除题及未决项。`latest.json` 只指向与当前任务一致的成功结果；旧结果标 stale。失败目录保留诊断，重复命令只重试生成，不重新录题。学生 HTML 不嵌入完整任务 JSON。
+`export` 同时生成预览与 Word，校对时可单独运行 `preview`。每次生成目录 `exports/rNNNN-随机标识/`，保存离线 HTML、全页 PNG 和 `report.json`。正式文件路径见 `student.docx` 和可选的 `answers.docx`，文件名含标题、纸型、日期与修订。`docxCheck` 记录题数和纸型尺寸，`layout.pages` 与 `layout.questionPages` 记录浏览器预览的分页，`maxPages` 在预览阶段校验。有 Word 渲染结果时也会核对实际页数上限。每份产物的 `layout.review` 记录首次发现、留用方案、剩余问题和逐题毫米数据；`wordReview.actual` 记录 LibreOffice 实际页数、逐页 PNG 和发现，宿主可在 Word 或 WPS 打开核对。
+
+`latest.json` 记录最近成功生成的结果。`status` 会把过期修订、历史 PDF 或 Word 文件缺失的正式结果标成 `stale:true`。用原任务重新 `export` 即可取得现行 Word 输出。失败目录保留诊断，可以只重试生成。学生卷按公开字段投影。

@@ -1,6 +1,7 @@
 import { randomUUID, createHash } from 'node:crypto';
-import { mkdir, readFile, writeFile, rename, open, rm } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rename, open, rm, stat } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
+import { setTimeout as delay } from 'node:timers/promises';
 import { blockers, images, inferPaper, parseWorksheet, questionSchema, sourceSchema, today, type Worksheet, type Question } from './schema.ts';
 import { organize } from './organization.ts';
 
@@ -16,12 +17,20 @@ export async function atomicJson(path: string, value: unknown): Promise<void> {
   finally { await rm(tmp, { force: true }); }
 }
 export async function loadTask(directory: string): Promise<Worksheet> { return parseWorksheet(JSON.parse(await readFile(join(directory, 'task.json'), 'utf8'))); }
-export async function withLock<T>(directory: string, action: () => Promise<T>): Promise<T> {
+export async function withLock<T>(directory: string, action: () => Promise<T>, waitMs = 0): Promise<T> {
   await mkdir(directory, { recursive: true });
   const lock = join(directory, '.task.lock');
+  const deadline = performance.now() + waitMs;
   let handle;
-  try { handle = await open(lock, 'wx'); }
-  catch (e) { throw new Error(`任务正由另一操作写入；稍后重试。进程意外终止时，确认无运行操作再移除 ${lock}`, { cause: e }); }
+  while (!handle) {
+    try { handle = await open(lock, 'wx'); }
+    catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== 'EEXIST' || performance.now() >= deadline) {
+        throw new Error(`任务正由另一操作写入；稍后重试。进程意外终止时，确认无运行操作再移除 ${lock}`, { cause: e });
+      }
+      await delay(20);
+    }
+  }
   try { await handle.writeFile(String(process.pid)); return await action(); }
   finally { await handle.close(); await rm(lock, { force: true }); }
 }
@@ -155,7 +164,20 @@ export async function currentExport(directory: string): Promise<unknown> {
   }
   try {
     const result = JSON.parse(await readFile(join(directory, 'latest.json'), 'utf8'));
-    return { ...result, stale: result.fingerprint !== fingerprint(w), currentRevision: w.revision, latestAttempt: attempt, generating: attempt?.status === 'generating' };
+    let downloadProblem: string | undefined;
+    if (result.mode === 'export') {
+      const files = result.answers ? [result.student?.docx, result.answers.docx] : [result.student?.docx];
+      if (files.some(path => typeof path !== 'string')) {
+        downloadProblem = '历史结果未提供 Word 文件，请按当前任务重新导出';
+      } else {
+        for (const path of files) {
+          const file = await stat(path).catch(() => undefined);
+          if (!file?.isFile() || file.size === 0) { downloadProblem = 'Word 文件缺失或为空，请重新导出'; break; }
+        }
+      }
+    }
+    return { ...result, stale: result.fingerprint !== fingerprint(w) || downloadProblem !== undefined, downloadProblem,
+      currentRevision: w.revision, latestAttempt: attempt, generating: attempt?.status === 'generating' };
   } catch (e) { if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e; return { latestAttempt: attempt, currentRevision: w.revision, generating: attempt?.status === 'generating' }; }
 }
 export function summary(w: Worksheet) {

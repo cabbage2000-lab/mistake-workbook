@@ -1,17 +1,23 @@
 ---
 name: mistake-workbook
-description: 将家长提供的数学、语文、英语错题文字、照片或截图整理为可重做练习，支持疑点校对、题图、A3/A4 排版、HTML 与全页缩略图预览、学生 PDF、可选独立答案册和任务恢复。不用于自动判错、独立 OCR 服务或在线题库。
+description: 将家长提供的数学、语文、英语错题文字、照片或截图整理为可重做练习，支持疑点校对、题图、A3/A4 排版、HTML 与全页缩略图预览、可编辑 Word 学生卷及可选独立答案册。
 ---
 
 # 错题打印助手
 
-交付可打印的原题重做材料。宿主模型读取素材、理解题意和对话修改；本包脚本只接受结构化数据，负责校验、保存、分页、预览和 PDF。不需要家长编写 JSON 或执行命令。
+交付可编辑、可打印的原题重做材料。宿主模型读取素材、理解题意和对话修改，脚本接收结构化数据并负责校验、保存、预览和 Word 生成。家长通过自然语言操作。
 
 ## 准备与恢复
 
-以本文件所在目录为 `<skill-dir>`，为本次练习选一个可写 `<task-dir>`。首次运行在技能目录执行 `npm ci` 和 `npm run setup:font`；需要 Node.js ≥22.6。完整包自带中文字体，初始化只做校验；WorkBuddy 轻量包首次初始化从固定 GitHub 提交下载同一份完整字体，校验 SHA-256 后保存，后续使用本地文件。下载失败时停止生成，检查网络后重试，或从完整包复制 `assets/fonts/NotoSansSC.woff2`，不可替换为系统字体。字体许可始终随包提供，生成的 HTML/PDF 内嵌字体、可离线查看。运行 `npm --prefix <skill-dir> run workbook -- doctor --task <task-dir>` 检查写入、字体、浏览器和 PDF。缺少浏览器时执行技能目录下的 `npx playwright install chromium`；也可设置 `MISTAKE_WORKBOOK_CHROME`。优先使用锁定 Playwright Chromium；报告记录实际浏览器版本。
+以本文件所在目录为 `<skill-dir>`，为本次练习选一个可写 `<task-dir>`。首次运行在技能目录执行 `npm ci` 和 `npm run setup:font`；需要 Node.js ≥22.6。
 
-宿主必须实际能读取用户文字/图片、写文件和运行脚本；doctor 不检测宿主视觉能力。不能读图时指出具体附件，保留可处理部分；不要伪造转录或把 HTML 称作已导出 PDF。
+<!-- font-setup:start -->
+本源码与完整包自带[中文字体](assets/fonts/NotoSansSC.woff2)。[字体初始化脚本](scripts/setup-font.ts)校验 SHA-256，缺失时下载固定版本，损坏时从完整包恢复。[字体许可](assets/OFL.txt)随包提供。离线 HTML 内嵌预览字体，Word 文档由编辑器选择可用字体。
+<!-- font-setup:end -->
+
+运行 `npm --prefix <skill-dir> run workbook -- doctor --task <task-dir>` 检查写入、字体、浏览器和 Word 生成。缺少浏览器时执行技能目录下的 `npx playwright install chromium`，也可设置 `MISTAKE_WORKBOOK_CHROME`。优先使用锁定 Playwright Chromium，报告记录实际浏览器版本。
+
+宿主需读取附件、写文件和运行脚本。用实际附件验证读图能力。遇到不可读附件时指出具体附件，保留可处理部分。只有校验通过的 `.docx` 才作为正式文件交付。
 
 从已有任务继续，先运行 `status --task <task-dir>`，读取 `task.json`，不要只依赖聊天记忆。输出保存在该任务目录；关闭聊天不会删除文件。附件会过期，必要题图先保存到任务资源中。
 
@@ -22,8 +28,8 @@ description: 将家长提供的数学、语文、英语错题文字、照片或�
 3. **确认疑点**：按题号集中列出具体疑点及来源，不给虚构置信百分比，不猜测缺失条件。按疑点 ID 逐项记录回复；部分回复不能确认其他项。无疑点、原题转录已核对且来源范围明确时，可直接 `confirm`，不为流程多问一轮。编辑题面、合并/拆分或重新识别后须重新确认；布局与排序不改变题意确认。未决题允许排除或标注草稿预览，禁止正式导出。
 4. **选择排版**：明确 A3/A4 优先；请求包含“试卷”默认 A3，其余 A4。说明推断结果并继续，不另设确认门槛。默认纵向、14mm 边距、14pt 题干、标准方案，字号限 12–20pt；已有偏好沿用。提供标准/紧凑/宽松、1/2/3 栏与逐题毫米留白。脚本会减栏、增加页数，不缩小题干或毫米书写区。具体三科模板见 [references/subjects.md](references/subjects.md)。
    逐题判断实际书写任务：英文书写可选四线格，英译中用中文横线，题内已有足够空格的选择/判断/填空可设 workspace.mm:0；阅读题逐小题配置。不要按题号交替线格，也不要把所有英语题都套四线格。仅设置 style 保留自动空间计算；指定 mm/lines 前核对答案长度，四线格总高度会向上补足完整 18mm 行。
-5. **预览**：运行 `preview --task <task-dir>`；存在未决项时只用 `--draft`。返回纸型、入选/确认/排除题数、页数、字号、栏数建议、未决项、HTML 链接和全部页面缩略图（或逐页导航）。只有源代码/内部 JSON 不算预览。查看报告和实际页面。用户修改后通过 `apply` 更新任务并重新预览；报告包含页数与题目页码变化。旧结果 `stale:true` 不能当最新预览。
-6. **导出 PDF**：用户已要求导出且无未决项时，呈现预览后直接 `export --task <task-dir>`，或一次 `generate` 生成预览和 PDF；不要求“同意预览”口令。仅主动要求答案时加 `--answers`。完成 [references/verification.md](references/verification.md) 的工件检查，查看实际 PDF 页面截图。返回学生 PDF、HTML、缩略图链接、纸型、修订号、题数/页数、排除项、保存路径。提示打印对应 A3/A4、实际大小 100%，不发送打印机任务。
+5. **预览**：运行 `preview --task <task-dir>`；存在未决项时只用 `--draft`。返回纸型、入选/确认/排除题数、页数、字号、栏数建议、未决项、HTML 链接和全部页面缩略图（或逐页导航）。只有源代码/内部 JSON 不算预览。读取 layout.review：正常卷直接进入交付检查；有 remaining 时由当前宿主担任排版专家，结合原始作答要求、题号、逐页图和实测毫米值，按 [交付检查](references/verification.md) 判断。脚本已对可处理的问题尝试一次重排并复验。用户修改后通过 `apply` 更新任务并重新预览；报告包含页数与题目页码变化。旧结果 `stale:true` 不能当最新预览。
+6. **导出 Word**：用户已要求导出且无未决项时，直接用 `export --task <task-dir>` 生成同修订的预览和正式 `.docx`，`generate` 是同义命令。用户要求答案时加 `--answers`，另交付 Word 答案册。按 [references/verification.md](references/verification.md) 核对，并返回 Word、HTML、缩略图、纸型、题数、修订、排除项和保存位置。区分浏览器预览页数与 wordReview 实测页数。复杂卷优先核对 Word 渲染页图；缺少渲染器时说明实际 Word 分页待核对。打印时选对应 A3/A4、实际大小 100%。
 
 题面或布局修改均由对话和任务协议处理；预览不是网页题目编辑器。使用正文块与子题保留关联；超长题会标“第 N 题（续）”，无法安全拆分的巨型块会报错，需按原题逻辑拆分，不允许缺内容生成。
 

@@ -1,21 +1,24 @@
 import { build } from 'esbuild';
-import { PDFDocument } from 'pdf-lib';
+import { latexToMath } from 'docx/math';
 import sharp from 'sharp';
 import { createHash, randomUUID } from 'node:crypto';
 import { readFile, writeFile, mkdir, realpath, rm } from 'node:fs/promises';
 import { dirname, join, resolve, relative, extname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { Browser } from 'playwright';
+import type { Browser, Page } from 'playwright';
 import { launchBrowser } from './browser.ts';
 import { blockers, paperSizes, type Worksheet, type Block } from './schema.ts';
 import { project, type PublicSheet, type PublicBlock } from './projection.ts';
 import { atomicJson, fingerprint, loadTask, withLock } from './model.ts';
 import { FONT_SHA256 } from './setup-font.ts';
+import { equationKey, writeWord, type RenderedEquation, type WordCheck, type WordRow } from './word.ts';
+import { reviewWord, type WordReview } from './word-review.ts';
+import type { LayoutReview } from '../assets/layout-review.ts';
 
 const skillRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-export interface LayoutReport { pages: number; questions: number; questionPages: Record<string, number[]>; fontPt: number; paperSize: 'A3' | 'A4'; pretextMeasurements: number; warnings: string[] }
+export interface LayoutReport { pages: number; questions: number; questionPages: Record<string, number[]>; fontPt: number; paperSize: 'A3' | 'A4'; pretextMeasurements: number; warnings: string[]; review: LayoutReview }
 export interface GenerateOptions { task: string; mode?: 'preview' | 'export'; answers?: boolean; draft?: boolean }
-export interface Artifact { html: string; pdf?: string; thumbnails: string[]; layout: LayoutReport; pdfCheck?: { pages: number; widthPt: number; heightPt: number }; durationMs: number }
+export interface Artifact { html: string; docx?: string; thumbnails: string[]; layout: LayoutReport; docxCheck?: WordCheck; wordReview?: WordReview; durationMs: number }
 export interface Generation { id: string; pid?: number; revision: number; fingerprint: string; paperSize: string; status: 'generating' | 'success' | 'failed' | 'stale'; mode: string; directory: string; draft: boolean; student?: Artifact; answers?: Artifact; error?: string; stateWarning?: string; durationMs?: number; exclusions: string[]; blockers: string[]; browserVersion?: string; pageChanges?: Record<string, { before: number[]; after: number[] }>; pageCountChange?: number }
 const escapeHtml = (s: string): string => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 export async function localResource(directory: string, asset: string): Promise<Buffer> {
@@ -71,13 +74,40 @@ export async function renderHtml(sheet: PublicSheet): Promise<string> {
   const { css, js, licenses } = await resources();
   const [width, height] = paperSizes[sheet.layout.paperSize];
   const gap = sheet.layout.preset === 'compact' ? 3 : sheet.layout.preset === 'spacious' ? 7 : 5;
+  const oralDimensions = sheet.oralLayout
+    ? `;--oral-number:${sheet.oralLayout.numberWidthMm}mm;--oral-answer:${sheet.oralLayout.answerWidthMm}mm;--oral-row:${sheet.oralLayout.rowHeightMm}mm` : '';
   const json = JSON.stringify(sheet).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
-  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src data:; img-src data:; connect-src 'none'; base-uri 'none'"><title>${escapeHtml(sheet.title)} · ${sheet.layout.paperSize} · r${sheet.revision}</title><style>${css}\n@page{size:${width}mm ${height}mm;margin:0}:root{--paper-width:${width}mm;--paper-height:${height}mm;--margin:${sheet.layout.marginMm}mm;--font:${sheet.layout.fontPt}pt;--cell:${sheet.layout.cellMm}mm;--gap:${gap}mm}</style></head><body>
+  return `<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; font-src data:; img-src data:; connect-src 'none'; base-uri 'none'"><title>${escapeHtml(sheet.title)} · ${sheet.layout.paperSize} · r${sheet.revision}</title><style>${css}\n@page{size:${width}mm ${height}mm;margin:0}:root{--paper-width:${width}mm;--paper-height:${height}mm;--margin:${sheet.layout.marginMm}mm;--font:${sheet.layout.fontPt}pt;--cell:${sheet.layout.cellMm}mm;--gap:${gap}mm${oralDimensions}}</style></head><body>
 <aside class="sidebar"><div class="brand"><span class="brand-text">▤ 错题打印助手</span><button id="collapse" aria-label="折叠或展开页面导航" aria-expanded="true">☰</button></div><nav aria-label="预览页面"><p class="nav-label">全部页面</p><div class="page-nav"></div></nav><div class="sidebar-note">${sheet.layout.paperSize} · ${sheet.kind === 'student' ? '学生练习' : '独立答案册'}<br>打印选择 ${sheet.layout.paperSize} 纸张<br>实际大小 / 100%</div></aside>
 <main><div class="topbar"><h1>${escapeHtml(sheet.title)}</h1><div class="actions"><label for="zoom">缩放</label><select id="zoom"><option value="0">适合宽度</option><option value="1">100%</option><option value="0.75">75%</option><option value="0.5">50%</option></select><button id="print" class="primary" disabled>打印预览</button></div></div><p class="status" role="status" aria-live="polite">正在加载字体并排版…</p><p class="warnings"></p><div class="preview"><div class="pages"></div></div></main>
 <script type="application/json" id="sheet-data">${json}</script><script>${js.replace(/<\/script/gi, '<\\/script')}</script><!-- Third-party licenses\n${licenses.replace(/--/g, '—')} --></body></html>`;
 }
-export async function inspectLayout(browser: Browser, htmlPath: string, pdfPath: string | undefined, directory: string, prefix: string, expected: PublicSheet): Promise<Artifact> {
+async function wordEquationImages(page: Page, warnings: string[]) {
+  const locators = page.locator('.sheet-body .formula[data-tex] .katex');
+  const formulas = await locators.evaluateAll(elements => elements.map(element => {
+    const parent = element.closest<HTMLElement>('[data-tex]')!;
+    return { tex: parent.dataset.tex!, display: parent.classList.contains('formula-block'), number: parent.closest<HTMLElement>('.question')!.dataset.number };
+  }));
+  const images = new Map<string, RenderedEquation>();
+  const supported = new Set<string>();
+  for (const [index, { tex, display, number }] of formulas.entries()) {
+    if (supported.has(tex)) continue;
+    const key = equationKey(tex, display);
+    if (!images.has(key)) {
+      try { latexToMath(tex); supported.add(tex); continue; }
+      catch { /* The validated preview supplies a rendered equation. */ }
+      const locator = locators.nth(index);
+      const size = await locator.boundingBox();
+      if (!size?.width || !size.height) throw new Error(`第 ${number} 题公式图像无法读取`);
+      images.set(key, { data: await locator.screenshot({ scale: 'css' }), width: size.width, height: size.height });
+    }
+    const warning = `第 ${number} 题含有以图片保留的 Word 公式`;
+    if (!warnings.includes(warning)) warnings.push(warning);
+  }
+  return images;
+}
+
+async function inspectLayout(browser: Browser, htmlPath: string, docxPath: string | undefined, directory: string, prefix: string, expected: PublicSheet): Promise<Artifact> {
   const started = performance.now(); const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
   try {
     await page.goto(pathToFileURL(htmlPath).href, { waitUntil: 'load' });
@@ -111,22 +141,32 @@ export async function inspectLayout(browser: Browser, htmlPath: string, pdfPath:
       const full = await page.locator('.paper').nth(i).screenshot({ scale: 'css' });
       await sharp(full).resize({ width: 650 }).png().toFile(join(directory, file)); thumbnails.push(file);
     }
-    let pdfCheck: Artifact['pdfCheck'];
-    if (pdfPath) {
-      await page.pdf({ path: pdfPath, preferCSSPageSize: true, printBackground: true, displayHeaderFooter: false, tagged: true });
-      const pdf = await PDFDocument.load(await readFile(pdfPath)); const [w, h] = paperSizes[expected.layout.paperSize].map(n => n * 72 / 25.4);
-      if (pdf.getPageCount() !== layout.pages) throw new Error(`PDF ${pdf.getPageCount()} 页与预览 ${layout.pages} 页不符`);
-      for (const p of pdf.getPages()) if (Math.abs(p.getWidth() - w) > 1 || Math.abs(p.getHeight() - h) > 1) throw new Error('PDF 纸张尺寸不符');
-      pdfCheck = { pages: pdf.getPageCount(), widthPt: pdf.getPage(0).getWidth(), heightPt: pdf.getPage(0).getHeight() };
+    let docxCheck: WordCheck | undefined;
+    let wordReview: WordReview | undefined;
+    if (docxPath) {
+      const rows = await page.locator('.sheet-body > .row').evaluateAll((elements): WordRow[] =>
+        elements.flatMap(row => {
+          const questionIds = Array.from(row.querySelectorAll<HTMLElement>(':scope > [data-id]:not([data-continuation])'), q => q.dataset.id!);
+          return questionIds.length ? [{ columns: Number(row.getAttribute('data-columns')), pageId: row.closest('.paper-frame')!.id, questionIds }] : [];
+        }));
+      const equationImages = await wordEquationImages(page, layout.warnings);
+      const review = layout.review;
+      if (review.initialPages?.length === layout.pages && review.initial.some(f => f.code === 'single-tail-row') &&
+          !review.remaining.some(f => f.code === 'single-tail-row')) {
+        const tail = rows.find(row => row.pageId === `page-${layout.pages}`);
+        if (tail) tail.reviewedPageBreak = true;
+      }
+      docxCheck = await writeWord(docxPath, expected, rows, equationImages, review.continuationBreaks);
+      wordReview = await reviewWord(docxPath, prefix, expected, layout.review);
     }
-    return { html: htmlPath, pdf: pdfPath, thumbnails, layout, pdfCheck, durationMs: Math.round(performance.now() - started) };
-  } catch (e) { if (pdfPath) await rm(pdfPath, { force: true }); throw e; }
+    return { html: htmlPath, docx: docxPath, thumbnails, layout, docxCheck, wordReview, durationMs: Math.round(performance.now() - started) };
+  } catch (e) { if (docxPath) await rm(docxPath, { force: true }); throw e; }
   finally { await page.close(); }
 }
 export async function generate(options: GenerateOptions): Promise<Generation> {
   const started = performance.now(); const taskDir = resolve(options.task); const w = await loadTask(taskDir); const problems = blockers(w);
   const mode = options.mode || 'export';
-  if (mode === 'export' && (options.draft || problems.length)) throw new Error(`正式导出被阻止：${problems.join('；') || '草稿模式不能导出 PDF'}`);
+  if (mode === 'export' && (options.draft || problems.length)) throw new Error(`正式导出被阻止：${problems.join('；') || '草稿模式不能导出 Word'}`);
   if (!w.questions.some(q => q.selected)) throw new Error('没有入选题目');
   if (mode === 'preview' && problems.length && !options.draft) throw new Error(`存在未决内容，请先处理，或使用 --draft 生成带标注草稿：${problems.join('；')}`);
   const id = `r${String(w.revision).padStart(4, '0')}-${randomUUID().slice(0, 8)}`;
@@ -141,11 +181,11 @@ export async function generate(options: GenerateOptions): Promise<Generation> {
     const filename = `${w.title.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').slice(0, 70)}-${w.layout.paperSize}-${w.date}-r${w.revision}`;
     const htmlPath = join(directory, `${filename}-学生卷.html`); await writeFile(htmlPath, await renderHtml(student));
     browser = await launchBrowser(); result.browserVersion = browser.version();
-    result.student = await inspectLayout(browser, htmlPath, mode === 'export' ? join(directory, `${filename}-学生卷.pdf`) : undefined, directory, 'student', student);
+    result.student = await inspectLayout(browser, htmlPath, mode === 'export' ? join(directory, `${filename}-学生卷.docx`) : undefined, directory, 'student', student);
     if (options.answers) {
       if (options.draft) throw new Error('草稿不能生成答案册');
       const answerSheet = project(w, 'answers'); const answerHtml = join(directory, `${filename}-答案册.html`); await writeFile(answerHtml, await renderHtml(answerSheet));
-      result.answers = await inspectLayout(browser, answerHtml, mode === 'export' ? join(directory, `${filename}-答案册.pdf`) : undefined, directory, 'answers', answerSheet);
+      result.answers = await inspectLayout(browser, answerHtml, mode === 'export' ? join(directory, `${filename}-答案册.docx`) : undefined, directory, 'answers', answerSheet);
     }
     result.status = 'success'; result.durationMs = Math.round(performance.now() - started);
     try {
@@ -167,12 +207,14 @@ export async function generate(options: GenerateOptions): Promise<Generation> {
         await atomicJson(join(taskDir, 'latest.json'), result); await atomicJson(join(taskDir, 'generation.json'), result);
       }
       await atomicJson(reportPath, result);
-    });
+    }, 500);
     return result;
   } catch (e) {
     result.status = 'failed'; result.error = (e as Error).message; result.durationMs = Math.round(performance.now() - started);
-    // Never advertise a partially successful PDF set as a successful export.
-    for (const artifact of [result.student, result.answers]) if (artifact?.pdf) { await rm(artifact.pdf, { force: true }); artifact.pdf = undefined; }
+    // A failed answer booklet invalidates the Word files from the whole attempt.
+    for (const artifact of [result.student, result.answers]) if (artifact?.docx) {
+      await rm(artifact.docx, { force: true }); artifact.docx = undefined; artifact.docxCheck = undefined;
+    }
     await atomicJson(reportPath, result);
     try {
       await withLock(taskDir, async () => {

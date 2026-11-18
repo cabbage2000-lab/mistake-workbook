@@ -201,6 +201,18 @@ test('修订 CAS、原子失败、磁盘恢复、旧文件失效',async()=>{
   await updateTask(dir,{expectedRevision:1,operations:[{op:'layout',changes:{paperSize:'A3'}}]});assert.equal((await loadTask(dir)).revision,2);assert.equal((await currentExport(dir) as any).stale,true);
   assert.equal(JSON.parse(await readFile(join(dir,'revisions/r0001.json'),'utf8')).layout.paperSize,'A4');
 });
+test('历史 PDF 结果需要重新导出 Word，原任务可按原修订恢复', async () => {
+  const dir = await mkdtemp(join(tmpdir(), 'workbook-legacy-export-'));
+  const original = await createTask(dir, small());
+  const pdf = join(dir, 'previous.pdf');
+  await writeFile(pdf, 'legacy export');
+  await writeFile(join(dir, 'latest.json'), JSON.stringify({ mode: 'export', fingerprint: fingerprint(original), student: { pdf } }));
+  const latest = await currentExport(dir) as { stale: boolean; downloadProblem: string; currentRevision: number };
+  assert.equal(latest.stale, true);
+  assert.match(latest.downloadProblem, /重新导出/);
+  assert.equal(latest.currentRevision, original.revision);
+  assert.equal(await readFile(pdf, 'utf8'), 'legacy export');
+});
 test('同修订并发修改只有一次成功，另一操作不能覆盖',async()=>{
   const dir=await mkdtemp(join(tmpdir(),'workbook-race-'));await createTask(dir,small());
   const result=await Promise.allSettled([updateTask(dir,{expectedRevision:1,operations:[{op:'metadata',changes:{title:'甲'}}]}),updateTask(dir,{expectedRevision:1,operations:[{op:'metadata',changes:{title:'乙'}}]})]);

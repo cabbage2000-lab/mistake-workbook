@@ -2,7 +2,7 @@
 
 [English](README.md) | **简体中文**
 
-[![版本 1.0.0](https://img.shields.io/badge/version-1.0.0-07c05f?style=flat)](package.json)
+[![版本 1.0.1](https://img.shields.io/badge/version-1.0.1-07c05f?style=flat)](package.json)
 [![CI](https://github.com/cabbage2000-lab/mistake-workbook/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cabbage2000-lab/mistake-workbook/actions/workflows/ci.yml)
 [![MIT 许可](https://img.shields.io/badge/license-MIT-blue?style=flat)](LICENSE)
 [![Node.js >=22.6](https://img.shields.io/badge/Node.js-%3E%3D22.6-43853d?style=flat)](#环境要求)
@@ -23,9 +23,9 @@
   </tr>
 </table>
 
-截图使用原创合成题目，点击图片可查看原图。[样张详情与 PDF 检查](#样张与预览)
+截图使用原创合成题目，点击图片可查看原图。[样张与打印](#样张与预览)
 
-生成结果包含离线 HTML、逐页预览图、学生 PDF 和可选独立答案册。
+生成结果包含离线 HTML、逐页预览图、可编辑 Word 学生卷 和可选独立答案册。
 
 本项目是可独立安装的 AI 技能（skill），支持 **WorkBuddy、Codex、Claude Code**。三者共用同一套 `SKILL.md`、参考文档与本地脚本，无需维护三个版本。宿主 AI 负责读取文字或照片、整理题意与对话修改；本地 TypeScript 脚本负责校验、保存、排版和导出。无需项目账号、常驻服务或数据库，运行时不依赖其他 skill。
 
@@ -40,7 +40,7 @@
 | 题面保留 | 支持文字、公式、选项、题图、表格与阅读子题，记录来源位置和原题号 |
 | 可打印布局 | A3/A4 纵向，标准、紧凑、宽松方案，自动或 1–3 栏，逐题毫米留白、横线、四线格与字格 |
 | 校对与修改 | 疑点逐项确认，选题与排除，排序、合并、拆分，重新识别时保护人工修改 |
-| 预览与导出 | 离线 HTML、全部页面 PNG、学生 PDF；按需生成独立答案册 |
+| 预览与导出 | 离线 HTML、全部页面 PNG、可编辑 Word 学生卷；按需生成独立答案册 |
 | 保存与恢复 | 任务落盘、修订快照、生成报告、旧结果标记，失败后可从原任务重试 |
 
 输入支持文字和 JPEG、PNG、WebP 图片；PDF/Word 需要先由宿主转成文字或图片。脚本不提供 OCR、自动判错或在线题库，也不自动补全缺失题意。每批图片最多 10 张为已验证范围，入选题目最多 100 题，超出需分批处理。
@@ -50,7 +50,7 @@
 ### 环境要求
 
 - Node.js **≥22.6** 和 npm。
-- Chromium 或 Chrome，用于实际分页、截图与 PDF 导出。
+- Chromium 或 Chrome，用于预览分页和截图。
 - 使用对话流程时，宿主 AI 须能读取文字/图片、写入文件并执行本地脚本；仅运行结构化示例不需要 AI 宿主。
 
 ### 安装到 WorkBuddy、Codex 或 Claude Code
@@ -63,6 +63,8 @@
 | 自带中文字体的完整包 | `npm run package` | `dist/mistake-workbook.zip` |
 
 上传 WorkBuddy 开放平台请选 **`mistake-workbook-workbuddy.zip`**。该包排除大体积中文字体、`tests/fixtures/` 和 `doc/evidence/`，字体许可直接放在 `assets/OFL.txt`，并补齐市场要求的中英文展示信息；ZIP 达到 3,000,000 字节或超出“技能根目录/二级目录/文件”层级时构建会失败。首次使用运行 `npm run setup:font`，从固定 GitHub 提交下载同一份完整字体并校验 SHA-256，需要联网一次；后续使用本地字体。完整包自带字体，适用于本地目录安装；开放平台上传使用上述轻量包。解压后保留整个目录，包括 `scripts/`、`assets/`、`references/` 和依赖清单。格式依据 [WorkBuddy 开放平台说明](https://open.workbuddy.cn/docs/skill)。
+
+生成的 WorkBuddy `SKILL.md` 将字体明确声明为必需的外部运行依赖，提供下载链接、校验值与初始化步骤；其中的内置资源引用只指向实际随包提供的文件。两种包构建时都会核对 `SKILL.md` 的本地资源引用与 ZIP 文件清单，缺失时直接失败。
 
 | 宿主 | 安装方式 / 最终目录 | 对话调用 |
 | --- | --- | --- |
@@ -91,7 +93,7 @@ cd "$workbook_skills_dir/mistake-workbook"
 
 解压后应直接存在 `<技能目录>/mistake-workbook/SKILL.md`，避免多嵌套一层同名目录。使用 WorkBuddy 上传入口时，可让宿主定位已安装技能的 `SKILL.md`，再在它所在目录准备下面的运行依赖。`agents/openai.yaml` 是 Codex 的可选展示配置，共用工作流写在 `SKILL.md` 中。
 
-也可以不安装，直接在项目中让任一宿主读取根目录 [SKILL.md](SKILL.md) 后执行。三个客户端的安装、技能发现与真实附件读图尚未逐一实测；已验证的是共用脚本的预览、PDF 导出、修改与恢复流程。
+也可以不安装，直接在项目中让任一宿主读取根目录 [SKILL.md](SKILL.md) 后执行。三个客户端的安装、技能发现与真实附件读图尚未逐一实测；已验证的是共用脚本的预览、Word 导出、修改与恢复流程。
 
 ### 准备运行依赖
 
@@ -103,7 +105,7 @@ npm run setup:font
 npx playwright install chromium
 ```
 
-首次安装依赖与浏览器需要网络。完整包自带中文字体，WorkBuddy 轻量包在初始化时下载；字体已存在时，`setup:font` 只校验、不重复下载。无法访问 GitHub 时，可从完整包复制 `assets/fonts/NotoSansSC.woff2` 后重试初始化。两种包均保留字体许可，公式字体随依赖提供。生成的 HTML/PDF 内嵌字体，可离线查看。
+首次安装依赖与浏览器需要网络。完整包自带中文字体，WorkBuddy 轻量包在初始化时下载；字体已存在时，`setup:font` 只校验、不重复下载。无法访问 GitHub 时，可从完整包复制 `assets/fonts/NotoSansSC.woff2` 后重试初始化。两种包均保留字体许可，公式字体随依赖提供。生成的 HTML 内嵌字体，可离线查看。Word 使用编辑器提供的字体，分页可能随字体和编辑器变化。
 
 设置了 `HTTPS_PROXY`、`https_proxy` 等代理环境变量时，字体初始化使用系统 `curl` 读取代理配置；否则使用 Node 内置下载器。
 
@@ -113,7 +115,7 @@ npx playwright install chromium
 export MISTAKE_WORKBOOK_CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ```
 
-`doctor` 会检查目录写入、已安装中文字体和浏览器 PDF 能力，并报告 Node 与浏览器版本；宿主是否能读图需通过实际附件验证。
+`doctor` 会检查目录写入、预览字体、浏览器截图和 Word 生成能力，并报告 Node 与浏览器版本；宿主是否能读图需通过实际附件验证。
 
 ## 通过对话使用
 
@@ -121,19 +123,19 @@ export MISTAKE_WORKBOOK_CHROME="/Applications/Google Chrome.app/Contents/MacOS/G
 
 | 宿主 | 示例请求 |
 | --- | --- |
-| WorkBuddy | `使用 mistake-workbook 错题打印助手，把这些照片里的错题整理为 A4 练习并导出学生 PDF。` |
-| Codex CLI / IDE | `$mistake-workbook 把这些错题整理为 A4 练习，导出学生 PDF 和独立答案册。` |
-| Claude Code | `/mistake-workbook 把这些错题整理为 A3 试卷，保留充足书写空间并导出 PDF。` |
+| WorkBuddy | `使用 mistake-workbook 错题打印助手，把这些照片里的错题整理为 A4 练习并导出可编辑 Word 学生卷。` |
+| Codex CLI / IDE | `$mistake-workbook 把这些错题整理为 A4 练习，导出可编辑 Word 学生卷和独立答案册。` |
+| Claude Code | `/mistake-workbook 把这些错题整理为 A3 试卷，保留充足书写空间并导出 Word。` |
 
 进入工作流后，三种宿主都可用自然语言继续修改，例如：
 
-> 把这些错题整理为 A4 练习，按题型分组，数学题保留空白作答区，导出学生 PDF。
+> 把这些错题整理为 A4 练习，按题型分组，数学题保留空白作答区，导出可编辑 Word 学生卷。
 
 > 用同一批题再生成 A3 试卷，书写空间宽松一些，并附上独立答案册。
 
 > 继续上次任务，把第 3 题暂时排除，第 5 题增加两行书写空间，再导出。
 
-宿主依次完成接收素材、整理题目、确认疑点、选择排版、预览和导出。家长只需说明收录范围、处理具体疑点与提出修改，无须编写 JSON 或运行命令。无未决疑点且已要求导出时，可直接完成预览与 PDF，不额外要求一次流程确认。
+宿主依次完成接收素材、整理题目、确认疑点、选择排版、预览和导出。家长只需说明收录范围、处理具体疑点与提出修改，无须编写 JSON 或运行命令。无未决疑点且已要求导出时，可直接完成预览与 Word 导出，不额外要求一次流程确认。
 
 ## 命令行快速开始
 
@@ -145,17 +147,16 @@ workbook_task_dir="$HOME/mistake-workbook-tasks/demo"
 # 检查运行环境；此命令会创建目标目录，但不会创建题目任务
 npm run workbook -- doctor --task "$workbook_task_dir"
 
-# 导入、校验、预览，再导出学生卷与答案册
+# 导入并校验，再一次生成预览、Word 学生卷和答案册
 npm run workbook -- init --task "$workbook_task_dir" --input examples/task.json
 npm run workbook -- validate --task "$workbook_task_dir"
-npm run workbook -- preview --task "$workbook_task_dir"
 npm run workbook -- export --task "$workbook_task_dir" --answers
 
 # 从磁盘读取任务与当前文件路径
 npm run workbook -- status --task "$workbook_task_dir"
 ```
 
-命令输出 JSON 报告。导出成功后，读取 `student.html`、`student.pdf`、`answers.pdf`；在 `status` 中，这些字段位于 `latest` 下。逐页 PNG 文件名位于 `student.thumbnails`，相对于报告中的 `directory`。
+命令输出 JSON 报告。导出成功后，读取 `student.html`、`student.docx`、`answers.docx`；在 `status` 中，这些字段位于 `latest` 下。逐页 PNG 文件名位于 `student.thumbnails`，相对于报告中的 `directory`。
 
 只需要学生卷时省略 `--answers`。`export` 自带 HTML 和全页 PNG 生成，可跳过单独的 `preview`；`generate` 是 `export` 的别名。再次执行示例时，已有任务用 `status` 恢复或用 `apply` 修改；重新 `init` 需更换目录。
 
@@ -165,16 +166,16 @@ npm run workbook -- status --task "$workbook_task_dir"
 
 | 子命令 | 常用参数 | 用途 |
 | --- | --- | --- |
-| `doctor` | 无 | 检查写入、字体、浏览器与 PDF 能力 |
+| `doctor` | 无 | 检查写入、字体、浏览器和 Word 生成 |
 | `init` | `--input <任务.json>`，或 `--title <标题> --request <要求>`；可加 `--paper A3` / `--paper A4` | 新建任务；仅指定标题时仍需添加来源与题目 |
 | `import-image` | `--file <图片> --id S1`；可加 `--rotate 90`、`--crop x,y,w,h` | 保存原图和工作副本；不自动识别或创建题目 |
 | `status` | 无 | 查看修订、来源覆盖、题型分组、疑点与当前工件 |
 | `apply` | `--input <补丁.json>` | 原子应用带 `expectedRevision` 的修改 |
 | `validate` | 无 | 校验结构、导出条件及必要题图；阻止项写入 `problems` |
 | `preview` | 可加 `--draft` | 生成 HTML 和逐页 PNG；有未决项时只能预览标注草稿 |
-| `export` / `generate` | 可加 `--answers` | 生成正式学生 PDF，以及按需答案册和对应预览 |
+| `export` / `generate` | 可加 `--answers` | 生成正式可编辑 Word 学生卷，以及按需答案册和对应预览 |
 
-`validate` 输出 `valid:true` 表示结构解析成功，能否导出还需检查 `exportable`；存在阻止项时退出码为 `2`。其他执行异常退出码为 `1`，错误以 JSON 写到标准错误流。草稿不能导出正式 PDF 或答案册。
+`validate` 输出 `valid:true` 表示结构解析成功，能否导出还需检查 `exportable`；存在阻止项时退出码为 `2`。其他执行异常退出码为 `1`，错误以 JSON 写到标准错误流。草稿不能导出正式 Word 文件或答案册。
 
 ## 排版与修改
 
@@ -226,14 +227,14 @@ npm run workbook -- export --task "$workbook_task_dir" --answers
 ├── latest.json                # 最近一次成功且生成时匹配任务的结果
 └── exports/r0001-<标识>/       # 每次生成独立目录
     ├── <标题>-<纸型>-<日期>-r1-学生卷.html
-    ├── <标题>-<纸型>-<日期>-r1-学生卷.pdf
-    ├── <标题>-<纸型>-<日期>-r1-答案册.html / .pdf
+    ├── <标题>-<纸型>-<日期>-r1-学生卷.docx
+    ├── <标题>-<纸型>-<日期>-r1-答案册.html / .docx
     ├── student-page-001.png
     ├── answers-page-001.png
     └── report.json
 ```
 
-PDF 只在正式导出时生成，答案册及其缩略图只在请求答案时生成。报告包含修订、题目页码、页数、纸型、字号、浏览器版本、耗时、排除项与阻止项。
+Word 只在正式导出时生成，答案册及其缩略图按需生成。报告记录修订、预览页数与题目页码、纸型、字号、浏览器版本、耗时、排除项和阻止项。`docxCheck` 记录 Word 题数和纸型。混合题型、长材料、图表、跨页或触发重排的 Word 会尝试本机渲染。安装 LibreOffice 和 Python 的 PyMuPDF 可取得实际页数和页面图。报告中 `layout.review` 记录重排前后结果，`wordReview` 记录成品核验状态。已有任务可直接重新导出。
 
 重新打开对话时，通过任务目录运行 `status` 即可恢复。修改后 `latest.stale:true` 表示已有文件对应旧内容，需重新生成；`latest.latestAttempt` 可查看最近一次生成中或失败的尝试。修复失败原因后重跑 `export`，无需重新上传已保存的题目。
 
@@ -241,17 +242,17 @@ PDF 只在正式导出时生成，答案册及其缩略图只在请求答案时�
 
 ## 样张与预览
 
-[桌面预览](doc/evidence/grouped-exam-desktop.png) · [手机预览](doc/evidence/grouped-exam-mobile.png) · [实际 PDF 检查记录](doc/evidence/grouped-exam-pdf-checks.json)
+[桌面预览](doc/evidence/grouped-exam-desktop.png) · [手机预览](doc/evidence/grouped-exam-mobile.png) · [历史 PDF 版本检查记录](doc/evidence/grouped-exam-pdf-checks.json)
 
-开发工作区的 `output/` 仅保留 `exam-by-type/` 这一批样张，6 套各 20 题。已生成时，可在本机打开 `output/exam-by-type/index.html` 查看学生 PDF、答案册、HTML 与全页 PNG；生成清单为同目录下的 `manifest.json`。这些完整生成文件不随源码上传。
+生成样张后，打开目标目录的 `index.html` 查看 6 套各 20 题的 Word 学生卷、答案册、HTML 与逐页 PNG。文件路径记录在同目录的 `manifest.json`。
 
-| 学科 | 每套题数 | A4 学生卷页数 | A3 学生卷页数 |
+| 学科 | 每套题数 | A4 历史预览页数 | A3 历史预览页数 |
 | --- | --- | --- | --- |
 | 数学 | 20 | 7 | 4 |
 | 语文 | 20 | 8 | 5 |
 | 英语 | 20 | 3 | 2 |
 
-以上为 2026-11-09 题型分组版本的保留样张数据，实际页数随内容、排版和依赖版本变化。打印时选择对应 A3/A4 纸张及“实际大小 / 100%”，以生成的 PDF 为交付物。
+表中页数来自 2026-11-09 的浏览器样张。Word 会按编辑器和本机字体重新分页。打印前在 Word 或 WPS 检查纸型，选择对应 A3/A4 和“实际大小 / 100%”。
 
 `output/` 被版本控制忽略，也不包含在安装 ZIP 中。新检出或安装环境需要复现完整样张时，指定一个尚未包含任务的新目录：
 
@@ -259,14 +260,14 @@ PDF 只在正式导出时生成，答案册及其缩略图只在请求答案时�
 npm run samples -- "$HOME/mistake-workbook-tasks/samples-new"
 ```
 
-该命令生成六套题的 HTML、PDF、逐页 PNG、`manifest.json` 和 `index.html`。现有样张中的 `pdf-checks.json` 与 `*-pdf-contact.png` 是另行验收生成的记录，不由 `samples` 命令生成。脚本不会自动清理旧目录；开发验收完成后按保留最新一批的约定整理 `output/`，实际练习任务请放在独立位置。
+该命令生成六套题的 Word 学生卷、独立答案册、HTML、逐页 PNG、`manifest.json` 和 `index.html`。
 
 ## 测试与打包
 
 ```sh
 npm run typecheck          # TypeScript 类型检查
 npm test                   # 数据、状态、修订与 ZIP 结构测试（源码目录）
-npm run test:integration   # 浏览器、分页、交互与 PDF 测试
+npm run test:integration   # 浏览器、分页、交互与 Word 测试
 # 或使用 npm run test:all 顺序运行上述三项
 
 npm run package            # 生成 ZIP 和同名 .sha256 校验文件
@@ -275,7 +276,7 @@ npm run test:install       # 验证刚生成的 ZIP 在独立目录安装运行
 npm run test:install -- --workbuddy  # 验证字体下载及轻量包运行
 ```
 
-单元/状态测试覆盖来源、确认、合并拆分、分组编号、答案投影、并发修订与恢复。浏览器测试覆盖 A3/A4 PDF、题目完整对账、实际毫米尺寸、续页、手机/桌面交互、缺资源、限页数与旧结果失效。
+单元/状态测试覆盖来源、确认、合并拆分、分组编号、答案投影、并发修订与恢复。集成测试覆盖 A3/A4 Word 的题数、纸型、题图、公式、作答区和答案隔离，也覆盖浏览器预览的分组续页、移动端交互、缺资源及旧结果失效。
 
 `test:integration` 和 `test:install` 需要可启动的浏览器。打包回归测试与 `test:install` 需要 `unzip`；安装测试从官方 npm registry 的缓存离线安装依赖，首次验证前运行 `npm ci --registry=https://registry.npmjs.org` 填充对应缓存。`--workbuddy` 测试还需联网下载固定字体。两种安装测试均在临时目录解压运行，将 `install-smoke.json` 保存到该临时目录，并在终端打印报告。安装测试前先构建对应包，确保校验当前源码。
 
@@ -291,6 +292,7 @@ GitHub Actions 在 Node.js 22、24 上执行依赖审计、类型检查、单元
 | --- | --- |
 | WorkBuddy 提示 ZIP 超过 3 MB | 执行 `npm run package:workbuddy`，上传 `dist/mistake-workbook-workbuddy.zip` |
 | WorkBuddy 提示“目录层级超限” | 用当前源码执行 `npm run package:workbuddy`，重新上传生成的轻量包；不要上传完整包或直接压缩源码目录 |
+| WorkBuddy 审核提示 `SKILL.md` 引用的内置字体缺失 | 用当前源码重新运行 `npm run package:workbuddy` 并上传新 ZIP。新版明确声明字体为通过 `npm run setup:font` 安装的外部依赖，上传包不内置该字体 |
 | 宿主找不到技能 | 核对上表中的安装位置及 `mistake-workbook/SKILL.md` 层级；WorkBuddy 检查技能是否启用，Codex / Claude Code 检查技能列表或命令是否出现，必要时重新打开会话 |
 | 浏览器启动失败 | 执行 `npx playwright install chromium`，或检查 `MISTAKE_WORKBOOK_CHROME` 是否指向可执行文件；再运行 `doctor` |
 | 任务目录已存在 | 用 `status` 恢复、用 `apply` 修改；新建任务换一个目录，不覆盖已有 `task.json` |

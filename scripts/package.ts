@@ -4,11 +4,20 @@ import { fileURLToPath } from 'node:url';
 import { deflateRawSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
+import { FONT_SHA256, FONT_URL } from './setup-font.ts';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const included=['SKILL.md','README.md','README.zh-CN.md','LICENSE','package.json','package-lock.json','tsconfig.json','scripts','assets','references','agents','examples','tests','doc'];
 function crc32(data:Buffer):number { let crc=0xffffffff;for(const byte of data){crc^=byte;for(let n=0;n<8;n++)crc=(crc>>>1)^((crc&1)?0xedb88320:0);}return (crc^0xffffffff)>>>0; }
 async function files(path:string):Promise<string[]>{const entries=await readdir(join(root,path),{withFileTypes:true});return (await Promise.all(entries.filter(e=>!e.name.startsWith('.')&&!e.name.endsWith('.tmp')&&!e.name.endsWith('.log')).map(e=>e.isDirectory()?files(join(path,e.name)):e.isFile()?[join(path,e.name)]:[]))).flat();}
+export function validateSkillResources(skill:string, includedFiles:readonly string[]){
+  const references=[...skill.matchAll(/\[[^\]]*\]\(([^\s)]+)(?:\s+"[^"]*")?\)/g)].map(match=>match[1]);
+  // Inline resource paths are also treated as built-in assets by the upload reviewer.
+  references.push(...[...skill.matchAll(/`((?:assets|scripts|references|agents|examples|templates|doc)\/[^`\s]+\.[a-z0-9]+)`/gi)].map(match=>match[1]));
+  const available=new Set(includedFiles);
+  const missing=[...new Set(references.filter(path=>!path.startsWith('#')&&!/^[a-z][a-z0-9+.-]*:/i.test(path)).map(path=>path.split(/[?#]/)[0].replace(/^\.\//,'')).filter(path=>!available.has(path)))];
+  if(missing.length)throw new Error(`SKILL.md 引用的内置资源未打包：${missing.join(', ')}。外部运行依赖须使用下载链接并说明初始化步骤。`);
+}
 export async function packageSkill(destination?:string, target:'full'|'workbuddy'='full'){
   destination ??= join(root,`dist/mistake-workbook${target==='workbuddy'?'-workbuddy':''}.zip`);
   let all:string[]=[];for(const p of included){if((await stat(join(root,p))).isFile())all.push(p);else all.push(...await files(p));}
@@ -30,9 +39,18 @@ export async function packageSkill(destination?:string, target:'full'|'workbuddy
       bytes=Buffer.from(bytes.toString('utf8').replace(/([("'])(?:doc\/)?evidence\/([^\s)"']*)/g,(_,prefix,file)=>`${prefix}${file?raw+file:tree}`));
     }
     if(target==='workbuddy'&&path==='SKILL.md'){
-      const metadata={display_name:'错题打印助手',display_name_en:'Mistake Workbook',description_zh:'将数学、语文、英语错题整理为可打印的 A3/A4 练习、学生 PDF 与独立答案册。',description_en:'Turn math, Chinese, and English mistakes into printable A3/A4 practice sheets, student PDFs, and separate answer booklets.',version:manifest.version,author:'cabbage2000-lab'};
-      bytes=Buffer.from(bytes.toString('utf8').replace(/^---\r?\n/,`---\n${Object.entries(metadata).map(([key,value])=>`${key}: ${JSON.stringify(value)}\n`).join('')}`));
+      const metadata={display_name:'错题打印助手',display_name_en:'Mistake Workbook',description_zh:'将数学、语文、英语错题整理为可编辑、可打印的 A3/A4 Word 学生卷与独立答案册。',description_en:'Turn math, Chinese, and English mistakes into editable A3/A4 Word worksheets and optional separate answer booklets.',version:manifest.version,author:'cabbage2000-lab'};
+      const fontSection=/<!-- font-setup:start -->[\s\S]*?<!-- font-setup:end -->/;
+      const source=bytes.toString('utf8');
+      if(!fontSection.test(source))throw new Error('SKILL.md 缺少字体初始化说明标记，无法生成 WorkBuddy 外部依赖说明');
+      const fontInstructions=`此 WorkBuddy 上传包不内置中文字体。Noto Sans SC 是生成练习必需的**外部运行依赖**，首次使用必须联网安装。
+
+执行 \`npm run setup:font\`，由包内的[字体初始化脚本](scripts/setup-font.ts)从[固定版本的完整字体](${FONT_URL})下载，按 SHA-256 \`${FONT_SHA256}\` 校验后保存到本地；后续运行只校验本地字体，不重复下载。[字体许可](assets/OFL.txt)始终随包提供。
+
+字体初始化未成功时说明网络或校验错误，修复后重试 \`npm run setup:font\`。无法联网时可用自带字体的完整包进行本地安装。离线 HTML 内嵌预览字体，Word 文档由编辑器选择可用字体。`;
+      bytes=Buffer.from(source.replace(fontSection,fontInstructions).replace(/^---\r?\n/,`---\n${Object.entries(metadata).map(([key,value])=>`${key}: ${JSON.stringify(value)}\n`).join('')}`));
     }
+    if(path==='SKILL.md')validateSkillResources(bytes.toString('utf8'),all);
     const compressed=deflateRawSync(bytes);const name=Buffer.from(`mistake-workbook/${path.replaceAll('\\','/')}`);const crc=crc32(bytes);
     const header=Buffer.alloc(30);header.writeUInt32LE(0x04034b50);header.writeUInt16LE(20,4);header.writeUInt16LE(0x800,6);header.writeUInt16LE(8,8);header.writeUInt16LE(0x21,12);header.writeUInt32LE(crc,14);header.writeUInt32LE(compressed.length,18);header.writeUInt32LE(bytes.length,22);header.writeUInt16LE(name.length,26);
     const entry=Buffer.alloc(46);entry.writeUInt32LE(0x02014b50);entry.writeUInt16LE(20,4);entry.writeUInt16LE(20,6);entry.writeUInt16LE(0x800,8);entry.writeUInt16LE(8,10);entry.writeUInt16LE(0x21,14);entry.writeUInt32LE(crc,16);entry.writeUInt32LE(compressed.length,20);entry.writeUInt32LE(bytes.length,24);entry.writeUInt16LE(name.length,28);entry.writeUInt32LE(offset,42);

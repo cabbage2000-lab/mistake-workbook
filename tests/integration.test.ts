@@ -2,26 +2,45 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, readFile, writeFile, readdir, rm, mkdir, copyFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { PDFDocument } from 'pdf-lib';
+import { unzipSync } from 'fflate';
 import { fixture, writeFixtureAssets } from '../scripts/fixtures.ts';
 import { createTask, loadTask, updateTask, currentExport } from '../scripts/model.ts';
 import { generate } from '../scripts/generate.ts';
+import { project } from '../scripts/projection.ts';
+import { reviewWord, wordReviewEnvironment } from '../scripts/word-review.ts';
 import { launchBrowser } from '../scripts/browser.ts';
 import type { Worksheet } from '../scripts/schema.ts';
 
 async function setup(w=fixture()) { const dir=await mkdtemp(join(tmpdir(),'workbook-e2e-'));await writeFixtureAssets(dir);await createTask(dir,w);return dir; }
 async function wait(page:any) { await page.waitForFunction(()=>document.documentElement.dataset.ready || document.documentElement.dataset.error); assert.equal(await page.evaluate(()=>document.documentElement.dataset.error),undefined); }
+async function wordParts(path: string) {
+  const entries = unzipSync(await readFile(path));
+  return { xml: new TextDecoder().decode(entries['word/document.xml']), images: Object.keys(entries).filter(name => /word\/media\/.+\.png$/.test(name)) };
+}
 test('试卷大题标题随首题分页、续页标记、分组不混栏，学生卷与答案册编号一致',async()=>{
   const w=fixture('math');const byId=new Map(w.questions.map(q=>[q.id,q]));
   w.questions=['math-13','math-2','math-16','math-17','math-1'].map(id=>byId.get(id)!);
   byId.get('math-17')!.workspace={mm:180};byId.get('math-16')!.workspace={mm:0};byId.get('math-13')!.workspace={mm:450};
   const dir=await setup(w);const result=await generate({task:dir,answers:true});const browser=await launchBrowser();
   try{
+    assert.equal(result.student!.layout.review.decision, 'kept-original');
+    assert.ok(result.student!.layout.review.remaining.some(f => f.code === 'detached-workspace'));
     const page=await browser.newPage();
     for(const artifact of [result.student!,result.answers!]){
       await page.goto(pathToFileURL(artifact.html).href);await wait(page);await page.emulateMedia({media:'print'});
+      const header = page.locator('.sheet-header').first();
+      const title = header.locator('h2');
+      assert.equal(await title.evaluate(node => getComputedStyle(node).textAlign), 'center');
+      if (artifact === result.student) {
+        const info = header.locator('.sheet-meta');
+        assert.match((await info.textContent())!, /班级\s+_+\s+姓名\s+_+/);
+        assert.equal(await info.evaluate(node => getComputedStyle(node).textAlign), 'center');
+      } else {
+        assert.equal(await header.locator('.sheet-meta').count(), 0);
+        assert.match((await title.textContent())!, /答案册$/);
+      }
       assert.deepEqual(await page.locator('.question:not([data-continuation])').evaluateAll(nodes=>nodes.map(n=>[n.getAttribute('data-id'),n.getAttribute('data-number')])),[['math-17','1'],['math-16','2'],['math-2','3'],['math-1','4'],['math-13','5']]);
       assert.deepEqual(await page.locator('.section-heading:not([data-continuation])').allTextContents(),['一、填空题共 1 题','二、选择题共 1 题','三、口算题共 2 题','四、解决问题共 1 题']);
       assert.equal(await page.locator('.section-heading').evaluateAll(nodes=>nodes.every(n=>n.nextElementSibling?.querySelector('.question')?.getAttribute('data-section-id')===n.getAttribute('data-section-id'))),true);
@@ -35,11 +54,16 @@ test('试卷大题标题随首题分页、续页标记、分组不混栏，学�
     assert.equal(await page.locator('[data-id="math-13"][data-continuation] .question-label').evaluateAll(nodes=>nodes.every(n=>n.textContent==='第 5 题（续）')),true);
   }finally{await browser.close();}
 });
-test('60题混合图文 A4/A3 全部入 PDF，同科共享页、换科起页、重排稳定',async()=>{
-  const dir=await setup();const a4=await generate({task:dir,answers:true});assert.equal(a4.student!.layout.questions,60);assert.ok(a4.student!.layout.pretextMeasurements>0);assert.equal(a4.student!.pdfCheck!.pages,a4.student!.layout.pages);
+test('60题混合图文 A4/A3 全部入 Word，题图、表格、公式与分科起页',async()=>{
+  const dir=await setup();const a4=await generate({task:dir,answers:true});assert.equal(a4.student!.layout.questions,60);assert.ok(a4.student!.layout.pretextMeasurements>0);
+  assert.deepEqual(a4.student!.docxCheck,{questions:60,widthMm:210,heightMm:297});
+  const student = await wordParts(a4.student!.docx!);
+  assert.ok(student.images.length > 0);assert.match(student.xml,/<w:drawing>/);assert.match(student.xml,/<w:tbl>/);assert.match(student.xml,/<m:f>/);
+  assert.equal((student.xml.match(/<w:pageBreakBefore\/>/g) ?? []).length,2);
+  assert.match(student.xml,/<w:pgSz[^>]+w:w="11906"[^>]+w:h="16838"/);
   assert.equal(Object.keys(a4.student!.layout.questionPages).length,60);assert.ok(a4.student!.layout.questionPages['chinese-20'].length>1);assert.ok(a4.student!.layout.questionPages['math-20'][0]<a4.student!.layout.questionPages['chinese-1'][0]);
   const again=await generate({task:dir});assert.deepEqual(again.student!.layout.questionPages,a4.student!.layout.questionPages);assert.notEqual(again.directory,a4.directory);assert.equal(again.answers,undefined);
-  await updateTask(dir,{expectedRevision:1,operations:[{op:'layout',changes:{paperSize:'A3'}}]});const a3=await generate({task:dir});assert.equal(a3.student!.layout.fontPt,a4.student!.layout.fontPt);assert.ok(a3.student!.layout.pages<a4.student!.layout.pages);assert.ok(a3.student!.pdfCheck!.widthPt>800);assert.equal(a3.pageCountChange,a3.student!.layout.pages-a4.student!.layout.pages);
+  await updateTask(dir,{expectedRevision:1,operations:[{op:'layout',changes:{paperSize:'A3'}}]});const a3=await generate({task:dir});assert.equal(a3.student!.layout.fontPt,a4.student!.layout.fontPt);assert.ok(a3.student!.layout.pages<a4.student!.layout.pages);assert.deepEqual(a3.student!.docxCheck,{questions:60,widthMm:297,heightMm:420});assert.equal(a3.pageCountChange,a3.student!.layout.pages-a4.student!.layout.pages);
 });
 test('浏览器物理空间、手机/桌面无横向溢出、导航/缩放/焦点/折叠交互',async()=>{
   const dir=await setup(fixture('chinese'));const result=await generate({task:dir,mode:'preview'});const browser=await launchBrowser();
@@ -59,14 +83,116 @@ test('浏览器物理空间、手机/桌面无横向溢出、导航/缩放/焦�
     const space=await page.locator('[data-id="math-7"] .workspace').evaluateAll(nodes=>nodes.reduce((n,x)=>n+x.getBoundingClientRect().height,0));assert.ok(Math.abs(space-48*96/25.4)<.2);
     assert.equal(await page.locator('.workspace-lines,.workspace-four-line').count(),0);
     assert.equal(await page.locator('.workspace').evaluateAll(nodes=>nodes.every(n=>{const s=getComputedStyle(n);return [s.borderTopWidth,s.borderRightWidth,s.borderBottomWidth,s.borderLeftWidth].every(w=>parseFloat(w)===0)&&s.backgroundImage==='none'&&!n.children.length;})),true);
-    for(const [id,mm] of [['math-1',12],['math-10',56],['math-13',64],['math-19',48]] as const){const height=await page.locator(`[data-id="${id}"] .workspace`).evaluateAll(nodes=>nodes.reduce((n,x)=>n+x.getBoundingClientRect().height,0));assert.ok(Math.abs(height-mm*96/25.4)<.2,`${id} 留白高度`);}
+    const oral = page.locator('[data-id="math-1"]');
+    assert.equal(await oral.locator('.workspace').count(), 0);
+    assert.ok(Math.abs((await oral.locator('.oral-answer').boundingBox())!.width - 21 * 96 / 25.4) < .2);
+    for(const [id,mm] of [['math-10',56],['math-13',64],['math-19',48]] as const){const height=await page.locator(`[data-id="${id}"] .workspace`).evaluateAll(nodes=>nodes.reduce((n,x)=>n+x.getBoundingClientRect().height,0));assert.ok(Math.abs(height-mm*96/25.4)<.2,`${id} 留白高度`);}
     await page.setViewportSize({width:390,height:844});await page.emulateMedia({media:'screen'});await page.screenshot({path:join(dirMath,'mobile.png'),fullPage:false});
   }finally{await browser.close();}
 });
-test('HTML/PDF学生答案隔离、独立答案册、黑白图与公式正常',async()=>{
+test('HTML 和 Word 学生答案隔离，答案册独立',async()=>{
   const w=fixture('english');w.questions=w.questions.slice(0,2);w.questions[0].answer!.text='UNIQUE_ANSWER_SENTINEL';w.sources[2].text='RAW_WORK_SENTINEL';const dir=await setup(w);const result=await generate({task:dir,answers:true});
-  const student=await readFile(result.student!.html,'utf8');const answers=await readFile(result.answers!.html,'utf8');assert.ok(!student.includes('UNIQUE_ANSWER_SENTINEL'));assert.ok(!student.includes('RAW_WORK_SENTINEL'));assert.ok(!student.includes('"english":"apple"'));assert.ok(answers.includes('UNIQUE_ANSWER_SENTINEL'));assert.notEqual(result.student!.pdf,result.answers!.pdf);
-  const pdf=await PDFDocument.load(await readFile(result.student!.pdf!));assert.equal(pdf.getPageCount(),result.student!.layout.pages);
+  const student=await readFile(result.student!.html,'utf8');const answers=await readFile(result.answers!.html,'utf8');assert.ok(!student.includes('UNIQUE_ANSWER_SENTINEL'));assert.ok(!student.includes('RAW_WORK_SENTINEL'));assert.ok(!student.includes('"english":"apple"'));assert.ok(answers.includes('UNIQUE_ANSWER_SENTINEL'));assert.notEqual(result.student!.docx,result.answers!.docx);
+  const studentWord = await wordParts(result.student!.docx!);const answerWord = await wordParts(result.answers!.docx!);
+  assert.doesNotMatch(studentWord.xml,/UNIQUE_ANSWER_SENTINEL|RAW_WORK_SENTINEL|\bapple\b/);
+  assert.match(studentWord.xml,/班级\s+_+\s+姓名\s+_+/);
+  assert.doesNotMatch(answerWord.xml,/班级\s+_+\s+姓名\s+_+/);
+  assert.match(answerWord.xml,/UNIQUE_ANSWER_SENTINEL/);
+  await rm(result.answers!.docx!);
+  const latest = await currentExport(dir) as { stale: boolean; downloadProblem: string };
+  assert.equal(latest.stale,true);assert.match(latest.downloadProblem,/Word 文件缺失/);
+});
+async function oralWorksheet(count: number): Promise<Worksheet> {
+  const w = fixture('math');
+  w.title = '三年级数学口算作业';
+  const template = w.questions[0];
+  w.layout.preset = 'compact';
+  const expressions: string[] = JSON.parse(await readFile(new URL('./fixtures/grade3-oral-50.json', import.meta.url), 'utf8'));
+  w.questions = expressions.slice(0, count).map((text, index) => ({
+    ...template, answer: undefined, id: `oral-${index + 1}`, blocks: [{ type: 'text', text }],
+  }));
+  return w;
+}
+test('50 道单步口算单行作答，Word 与 HTML 在第 27 题后分页', async () => {
+  const w = await oralWorksheet(50);
+  const result = await generate({ task: await setup(w) });
+  const student = result.student!;
+  assert.equal(student.layout.review.decision, 'first-pass');
+  assert.equal(student.wordReview?.status, 'structure-only');
+  assert.equal(student.layout.pages, 2);
+  assert.deepEqual(student.layout.warnings, []);
+  assert.deepEqual(Object.values(student.layout.questionPages), [...Array.from({ length: 27 }, () => [1]), ...Array.from({ length: 23 }, () => [2])]);
+  const { xml } = await wordParts(student.docx!);
+  const pages = xml.split('<w:pageBreakBefore/>');
+  assert.equal(pages.length, 2);
+  assert.match(pages[0], /question_27"/);
+  assert.doesNotMatch(pages[0], /question_28"/);
+  assert.match(pages[1], /question_50"/);
+  assert.equal((xml.match(/<w:tbl>/g) ?? []).length, 2);
+  assert.equal((xml.match(/<w:t[^>]*>_______<\/w:t>/g) ?? []).length, 50);
+  assert.equal((xml.match(/共 50 题/g) ?? []).length, 1);
+});
+test('三十道口算混排两道应用题，特殊作答区逐题保留', async () => {
+  const w = await oralWorksheet(30);
+  w.questions[1].blocks = [{ type: 'text', text: '72 − 38 ＝' }];
+  w.questions[14].workspace = { mm: 32 };
+  const applications = fixture('math').questions.filter(q => q.type === 'application').slice(0, 2);
+  applications.forEach(q => { q.workspace = { mm: 64 }; });
+  w.questions.push(...applications);
+  const { student } = await generate({ task: await setup(w) });
+  const items = student!.layout.review.pages.flatMap(p => p.questions);
+  assert.equal(items.filter(q => q.answerWidthMm === 21).length, 29);
+  assert.deepEqual(items.filter(q => q.workspaceMm).map(q => [q.number, q.workspaceMm]), [[15, 32], [31, 64], [32, 64]]);
+  const { xml } = await wordParts(student!.docx!);
+  assert.equal((xml.match(/<w:t[^>]*>_______<\/w:t>/g) ?? []).length, 29);
+  assert.match(xml, /question_14"[\s\S]*question_15"[\s\S]*question_16"[\s\S]*二、解决问题[\s\S]*question_32"/);
+  assert.ok(student!.wordReview?.reasons.includes('混合题型'));
+  if ((await wordReviewEnvironment()).available) {
+    const actual = student!.wordReview!.actual!;
+    assert.ok(actual?.pages >= 1, student!.wordReview!.detail);
+    assert.equal(actual.pages, actual.thumbnails.length);
+    const files = await readdir(dirname(student!.docx!));
+    assert.ok(actual.thumbnails.every(file => files.includes(file)));
+    const limited = project(w, 'student');
+    limited.layout.maxPages = 1;
+    await assert.rejects(reviewWord(student!.docx!, 'limit', limited, student!.layout.review), /Word 实际排版需要.*超过限制/);
+  }
+  const before = process.env.MISTAKE_WORKBOOK_SOFFICE;
+  try {
+    process.env.MISTAKE_WORKBOOK_SOFFICE = '/missing/review/soffice';
+    const unavailable = await reviewWord(student!.docx!, 'missing', project(w, 'student'), student!.layout.review);
+    assert.equal(unavailable.status, 'unavailable'); assert.equal(unavailable.actual, undefined);
+  } finally {
+    if (before === undefined) delete process.env.MISTAKE_WORKBOOK_SOFFICE; else process.env.MISTAKE_WORKBOOK_SOFFICE = before;
+  }
+});
+test('只有一行短题的尾页触发一次重排，字号、得数栏宽和题序保持', async () => {
+  const w = await oralWorksheet(28);
+  const { student } = await generate({ task: await setup(w) });
+  const review = student!.layout.review;
+  assert.equal(review.decision, 'revised');
+  assert.deepEqual(review.initial.map(f => [f.code, f.numbers]), [['single-tail-row', [28]]]);
+  assert.deepEqual(review.remaining, []);
+  assert.deepEqual(review.pages.map(p => p.questions.length), [15, 13]);
+  assert.ok(review.pages.flatMap(p => p.questions).every(q => q.answerWidthMm === 21));
+  const { xml } = await wordParts(student!.docx!);
+  const pages = xml.split('<w:pageBreakBefore/>');
+  assert.match(pages[0], /question_15"/); assert.doesNotMatch(pages[0], /question_16"/);
+  assert.match(pages[1], /question_16"/);
+});
+test('跨页的短答题将最后一段提问与全部作答区移到同页', async () => {
+  const w = fixture('math');
+  w.questions = [{ ...w.questions[0], type: 'reading', columns: 1, workspace: { mm: 100 },
+    blocks: [{ type: 'text', text: Array.from({ length: 15 }, (_, i) => `第 ${i + 1} 天共售出 ${20 + i} 本书。`).join('\n') },
+      { type: 'text', text: '最后一天比第一天多售出多少本书？请列式计算。' }] }];
+  const { student } = await generate({ task: await setup(w) });
+  const review = student!.layout.review;
+  assert.equal(review.decision, 'revised');
+  assert.deepEqual(review.initial.map(f => f.code), ['detached-workspace']);
+  assert.deepEqual(review.pages.map(p => p.questions[0].workspaceMm), [0, 100]);
+  assert.deepEqual(review.remaining, []);
+  const { xml } = await wordParts(student!.docx!);
+  assert.match(xml, /第 15 天[\s\S]*<w:pageBreakBefore\/>[\s\S]*第 1 题（续）[\s\S]*最后一天比第一天/);
 });
 test('线格实际行距、完整四线格和跨页不挤压，英语样例按任务使用作答区',async()=>{
   const w=fixture('english');
@@ -100,12 +226,14 @@ test('线格实际行距、完整四线格和跨页不挤压，英语样例按�
     for(let i=9;i<=12;i++){assert.equal(rows(`english-${i}`).length,1);assert.ok(rows(`english-${i}`)[0].style.includes('workspace-lines'));assert.ok(Math.abs(rows(`english-${i}`)[0].heightMm-14)<.02);}
     for(const i of [13,14,15,18])assert.equal(rows(`english-${i}`).length,0);
     assert.equal(rows('english-19').length,3);
-    assert.equal(result.student!.pdfCheck!.pages,result.student!.layout.pages);
+    assert.equal(result.student!.docxCheck!.questions,result.student!.layout.questions);
+    const { xml } = await wordParts(result.student!.docx!);
+    assert.match(xml,/<w:trHeight w:val="\d+" w:hRule="exact"\/>/);
   }finally{await browser.close();}
 });
-test('待确认禁止PDF、草稿标记、排除后可以导出并明确排除列表',async()=>{
+test('待确认禁止导出 Word、草稿标记、排除后可以导出并明确排除列表',async()=>{
   const w=fixture('math');w.questions=w.questions.slice(0,2);w.questions[0].confirmation='pending';w.questions[0].issues=[{id:'unclear',message:'负号模糊',resolved:false}];const dir=await setup(w);
-  await assert.rejects(generate({task:dir}),/math-1/);const draft=await generate({task:dir,mode:'preview',draft:true});assert.equal(draft.student!.pdf,undefined);
+  await assert.rejects(generate({task:dir}),/math-1/);const draft=await generate({task:dir,mode:'preview',draft:true});assert.equal(draft.student!.docx,undefined);
   const browser=await launchBrowser();try{const page=await browser.newPage();await page.goto(pathToFileURL(draft.student!.html).href);await wait(page);assert.ok((await page.locator('.draft-label').first().textContent())!.includes('草稿'));assert.equal(await page.locator('#print').isDisabled(),true);}finally{await browser.close();}
   await updateTask(dir,{expectedRevision:1,operations:[{op:'select',id:'math-1',selected:false,reason:'暂无法确认'}]});const ready=await generate({task:dir});assert.equal(ready.student!.layout.questions,1);assert.deepEqual(ready.exclusions,['math-1']);
 });
@@ -121,6 +249,19 @@ test('单栏长公式不可放置明确失败，限页数不丢题',async()=>{
 test('长公式可减栏、超长单题逻辑续页编号不变',async()=>{
   const w=fixture('math');w.questions=w.questions.slice(0,1);w.questions[0].columns=3;w.questions[0].blocks=[{type:'formula',tex:'12345+67890+12345+67890'}];const dir=await setup(w);const result=await generate({task:dir});assert.ok(result.student!.layout.warnings.some(x=>x.includes('栏调整')));
 });
+test('预览支持而 Word 公式转换器不支持的公式保留图像与原始公式', async () => {
+  const w = fixture('math');
+  w.questions = w.questions.slice(0, 1);
+  const tex = String.raw`\utilde{a}`;
+  w.questions[0].blocks = [{ type: 'text', text: `比较 \\(${tex}\\) 与下面的式子。` }, { type: 'formula', tex }];
+  const dir = await setup(w);
+  const result = await generate({ task: dir });
+  const { xml, images } = await wordParts(result.student!.docx!);
+  assert.ok(images.length > 0);
+  assert.equal((xml.match(/<w:drawing>/g) ?? []).length, 2);
+  assert.ok(xml.includes(`descr="${tex}"`));
+  assert.ok(result.student!.layout.warnings.some(warning => warning.includes('以图片保留')));
+});
 test('生成期间修订失效：旧结果不能替换当前文件',async()=>{
   const dir=await setup(fixture('math'));const promise=generate({task:dir});
   for(let i=0;i<100;i++){try{await readFile(join(dir,'generation.json'));break;}catch{await new Promise(r=>setTimeout(r,20));}}
@@ -129,14 +270,14 @@ test('生成期间修订失效：旧结果不能替换当前文件',async()=>{
 });
 test('浏览器依赖失败报告具体能力、保留HTML与任务可重试',async()=>{
   const w=fixture('math');w.questions=w.questions.slice(0,1);const dir=await setup(w);const old=process.env.MISTAKE_WORKBOOK_CHROME;process.env.MISTAKE_WORKBOOK_CHROME='/missing/chromium';
-  try{await assert.rejects(generate({task:dir}),/浏览器不存在/);assert.equal((await loadTask(dir)).questions.length,1);const dirs=await readdir(join(dir,'exports'));const files=await readdir(join(dir,'exports',dirs[0]));assert.ok(files.some(f=>f.endsWith('.html')));assert.ok(!files.some(f=>f.endsWith('.pdf')));}finally{if(old===undefined)delete process.env.MISTAKE_WORKBOOK_CHROME;else process.env.MISTAKE_WORKBOOK_CHROME=old;}
+  try{await assert.rejects(generate({task:dir}),/浏览器不存在/);assert.equal((await loadTask(dir)).questions.length,1);const dirs=await readdir(join(dir,'exports'));const files=await readdir(join(dir,'exports',dirs[0]));assert.ok(files.some(f=>f.endsWith('.html')));assert.ok(!files.some(f=>f.endsWith('.docx')));}finally{if(old===undefined)delete process.env.MISTAKE_WORKBOOK_CHROME;else process.env.MISTAKE_WORKBOOK_CHROME=old;}
   assert.equal((await generate({task:dir})).status,'success');
 });
-test('同修订并发预览/导出只保留更新的请求和PDF下载',async()=>{
+test('同修订并发预览/导出只保留更新的请求和 Word 下载',async()=>{
   const w=fixture('math');w.questions=w.questions.slice(0,1);const dir=await setup(w);const older=generate({task:dir,mode:'preview'});
   for(let i=0;i<100;i++){try{await readFile(join(dir,'generation.json'));break;}catch{await new Promise(r=>setTimeout(r,20));}}
   await new Promise(r=>setTimeout(r,100));const newer=generate({task:dir});const [oldResult,newResult]=await Promise.all([older,newer]);
-  assert.equal(oldResult.status,'stale');assert.equal(newResult.status,'success');const latest=await currentExport(dir) as any;assert.equal(latest.id,newResult.id);assert.ok(latest.student.pdf);assert.equal(latest.stale,false);assert.equal((await loadTask(dir)).stage,'export');
+  assert.equal(oldResult.status,'stale');assert.equal(newResult.status,'success');const latest=await currentExport(dir) as any;assert.equal(latest.id,newResult.id);assert.ok(latest.student.docx);assert.equal(latest.stale,false);assert.equal((await loadTask(dir)).stage,'export');
 });
 test('100题与10份图片来源能力包络，逐题与全部缩略图可追溯',async()=>{
   const w=fixture('math');const template=w.questions[0];w.questions=Array.from({length:100},(_,i)=>({...structuredClone(template),id:`q-${i+1}`}));

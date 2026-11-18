@@ -2,7 +2,7 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-[![Version 1.0.0](https://img.shields.io/badge/version-1.0.0-07c05f?style=flat)](package.json)
+[![Version 1.0.1](https://img.shields.io/badge/version-1.0.1-07c05f?style=flat)](package.json)
 [![CI](https://github.com/cabbage2000-lab/mistake-workbook/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/cabbage2000-lab/mistake-workbook/actions/workflows/ci.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue?style=flat)](LICENSE)
 [![Node.js >=22.6](https://img.shields.io/badge/Node.js-%3E%3D22.6-43853d?style=flat)](#requirements)
@@ -23,9 +23,9 @@ Turn math, Chinese, and English questions into printable A3/A4 practice workshee
   </tr>
 </table>
 
-Synthetic sample questions, shown in the Chinese worksheet interface. Click either image to view it at full size. [Sample details and PDF checks](#samples-and-printing)
+Synthetic sample questions, shown in the Chinese worksheet interface. Click either image to view it at full size. [Samples and printing](#samples-and-printing)
 
-This standalone AI skill produces offline HTML, page thumbnails, student PDFs, and optional separate answer booklets. The AI host reads text or photos and handles corrections through conversation; local TypeScript scripts validate, save, paginate, and export the content. All three hosts use the same `SKILL.md` and supporting files. No project account, persistent service, database, or other skill is required.
+This standalone AI skill produces offline HTML, page thumbnails, editable Word worksheets, and optional separate answer booklets. The AI host reads text or photos and handles corrections through conversation; local TypeScript scripts validate, save, paginate, and export the content. All three hosts use the same `SKILL.md` and supporting files. No project account, persistent service, database, or other skill is required.
 
 The worksheet interface, skill instructions, and reference documents are currently in Chinese. This repository provides English and Chinese READMEs.
 
@@ -40,7 +40,7 @@ The worksheet interface, skill instructions, and reference documents are current
 | Original content | Preserve text, formulas, options, diagrams, tables, reading subquestions, source locations, and original question numbers |
 | Print layout | A3/A4 portrait; standard, compact, or spacious presets; automatic or 1–3 columns; writing space measured in millimeters; ruled lines, four-line guides, and character grids |
 | Review and editing | Resolve specific uncertainties, include or exclude questions, reorder, merge, split, and protect manual edits during re-identification |
-| Preview and export | Offline HTML, PNG previews of every page, student PDFs, and optional separate answer booklets |
+| Preview and export | Offline HTML, PNG previews of every page, editable Word worksheets, and optional separate answer booklets |
 | Recovery | Saved tasks, revision snapshots, generation reports, stale-result detection, and retries without re-entering questions |
 
 Inputs are text and JPEG, PNG, or WebP images. The host must convert PDF/Word documents to text or images first. The scripts do not perform OCR, automatically identify wrong answers, provide an online question bank, or invent missing problem details. The validated scope is up to 10 images per batch and 100 selected questions; split larger inputs into batches.
@@ -50,7 +50,7 @@ Inputs are text and JPEG, PNG, or WebP images. The host must convert PDF/Word do
 ### Requirements
 
 - **Node.js ≥22.6** and npm.
-- Chromium or Chrome for pagination, screenshots, and PDF generation.
+- Chromium or Chrome for preview pagination and screenshots.
 - For the conversational workflow, an AI host that can read text/images, write files, and execute local scripts. Running the structured example directly does not require an AI host.
 
 ### Install in WorkBuddy, Codex, or Claude Code
@@ -63,6 +63,8 @@ From source, run `npm ci`, then choose a distribution:
 | Full package with the Chinese font | `npm run package` | `dist/mistake-workbook.zip` |
 
 Upload **`mistake-workbook-workbuddy.zip`** to the WorkBuddy Open Platform. It omits the large Chinese font, `tests/fixtures/`, and `doc/evidence/`, keeps the font license directly in `assets/OFL.txt`, and adds the required bilingual marketplace metadata. The build fails if the ZIP reaches 3,000,000 bytes or any file is deeper than `skill-root/subdirectory/file`. On first use, `npm run setup:font` downloads the same complete font from a pinned GitHub commit and verifies its SHA-256. This requires network access once; subsequent runs use the local font. The full package includes the font for local folder installation; use the lightweight package for platform uploads. Keep the complete extracted folder, including `scripts/`, `assets/`, `references/`, and the dependency manifests. See the [WorkBuddy Open Platform format](https://open.workbuddy.cn/docs/skill).
+
+The generated WorkBuddy `SKILL.md` declares the font as a required external runtime dependency, with its download link, checksum, and setup instructions. It references only packaged files as built-in resources. Both package builds check local resource references in `SKILL.md` against the ZIP contents and fail on missing files.
 
 | Host | Installation / final location | Invocation |
 | --- | --- | --- |
@@ -91,7 +93,7 @@ cd "$workbook_skills_dir/mistake-workbook"
 
 The result should be `<skills-directory>/mistake-workbook/SKILL.md`, without an extra nested `mistake-workbook/` folder. After a WorkBuddy upload, ask the host to locate the installed `SKILL.md` and prepare dependencies in that directory. `agents/openai.yaml` contains optional Codex display metadata; the shared workflow lives in `SKILL.md`.
 
-You can also use the source folder directly by asking any supported host to read [SKILL.md](SKILL.md). Installation, skill discovery, and real image input have not yet been tested separately in all three clients. The shared local preview, PDF export, editing, and recovery workflows have been verified.
+You can also use the source folder directly by asking any supported host to read [SKILL.md](SKILL.md). Installation, skill discovery, and real image input have not yet been tested separately in all three clients. The shared local preview, Word export, editing, and recovery workflows have been verified.
 
 ### Prepare runtime dependencies
 
@@ -103,7 +105,7 @@ npm run setup:font
 npx playwright install chromium
 ```
 
-Initial dependency and browser installation requires network access. The full package includes the Chinese font; the WorkBuddy package downloads it during setup. `setup:font` verifies an existing font without downloading it again. If GitHub is unavailable, copy `assets/fonts/NotoSansSC.woff2` from the full package, then rerun setup. Font licenses are included in both packages, and formula fonts come with dependencies. Generated HTML and PDFs embed their fonts and can be read offline.
+Initial dependency and browser installation requires network access. The full package includes the Chinese font; the WorkBuddy package downloads it during setup. `setup:font` verifies an existing font without downloading it again. If GitHub is unavailable, copy `assets/fonts/NotoSansSC.woff2` from the full package, then rerun setup. Font licenses are included in both packages, and formula fonts come with dependencies. Generated HTML embeds its fonts for offline reading. Word uses fonts available in the editor, which can affect pagination.
 
 When a proxy environment variable such as `HTTPS_PROXY` or `https_proxy` is set, font setup uses system `curl` to honor it; otherwise it uses Node's built-in downloader.
 
@@ -113,7 +115,7 @@ Browser selection uses `MISTAKE_WORKBOOK_CHROME` first, then Playwright's bundle
 export MISTAKE_WORKBOOK_CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 ```
 
-`doctor` checks directory write access, the installed Chinese font, and browser PDF support, and reports Node and browser versions. Verify the host's image-reading capability with an actual attachment.
+`doctor` checks directory write access, the installed Chinese font, and browser screenshots and DOCX generation, and reports Node and browser versions. Verify the host's image-reading capability with an actual attachment.
 
 ## Use through conversation
 
@@ -121,19 +123,19 @@ After installation and activation, provide question text or photos with your req
 
 | Host | Example request |
 | --- | --- |
-| WorkBuddy | `Use mistake-workbook to turn the questions in these photos into an A4 practice worksheet and export a student PDF.` |
-| Codex CLI / IDE | `$mistake-workbook Organize these questions into an A4 worksheet and export a student PDF with a separate answer booklet.` |
-| Claude Code | `/mistake-workbook Create an A3 worksheet from these questions, leave generous writing space, and export a PDF.` |
+| WorkBuddy | `Use mistake-workbook to turn the questions in these photos into an A4 practice worksheet and export a Word worksheet.` |
+| Codex CLI / IDE | `$mistake-workbook Organize these questions into an A4 worksheet and export a Word worksheet with a separate answer booklet.` |
+| Claude Code | `/mistake-workbook Create an A3 worksheet from these questions, leave generous writing space, and export a Word document.` |
 
 Continue with natural-language changes in any host:
 
-> Group these questions by type, leave blank writing space for math, and export an A4 student PDF.
+> Group these questions by type, leave blank writing space for math, and export an A4 Word worksheet.
 
 > Create an A3 version from the same questions with more writing space and a separate answer booklet.
 
 > Resume the previous task, exclude question 3 for now, add two writing lines to question 5, and export again.
 
-The host receives materials, organizes questions, resolves uncertainties, selects a layout, previews, and exports. Parents specify which questions to include and answer concrete clarification questions; they do not need to edit JSON or run commands. When export is already requested and no uncertainties remain, preview and PDF generation can proceed together.
+The host receives materials, organizes questions, resolves uncertainties, selects a layout, previews, and exports. Parents specify which questions to include and answer concrete clarification questions; they do not need to edit JSON or run commands. When export is already requested and no uncertainties remain, preview and Word generation can proceed together.
 
 ## CLI quick start
 
@@ -145,17 +147,16 @@ workbook_task_dir="$HOME/mistake-workbook-tasks/demo"
 # Check the environment; creates the directory but not a question task
 npm run workbook -- doctor --task "$workbook_task_dir"
 
-# Import, validate, preview, and export a student PDF and answer booklet
+# Import, validate, and generate the preview, Word worksheet, and answer booklet
 npm run workbook -- init --task "$workbook_task_dir" --input examples/task.json
 npm run workbook -- validate --task "$workbook_task_dir"
-npm run workbook -- preview --task "$workbook_task_dir"
 npm run workbook -- export --task "$workbook_task_dir" --answers
 
 # Read the saved task and current output paths
 npm run workbook -- status --task "$workbook_task_dir"
 ```
 
-Commands return JSON reports. After export, use `student.html`, `student.pdf`, and `answers.pdf`; in a `status` response, these fields are under `latest`. Filenames in `student.thumbnails` are relative to the report's `directory`.
+Commands return JSON reports. After export, use `student.html`, `student.docx`, and `answers.docx`; in a `status` response, these fields are under `latest`. Filenames in `student.thumbnails` are relative to the report's `directory`.
 
 Omit `--answers` for a student worksheet only. `export` also generates HTML and every page PNG, so a separate `preview` step is optional. `generate` is an alias for `export`. To continue an existing task, use `status` or `apply`; a new `init` requires a different directory.
 
@@ -165,16 +166,16 @@ Use `npm run workbook -- <command> --task <task-directory> [options]`. Show comp
 
 | Command | Common options | Purpose |
 | --- | --- | --- |
-| `doctor` | None | Check write access, fonts, browser, and PDF support |
+| `doctor` | None | Check write access, fonts, browser, and Word generation |
 | `init` | `--input <task.json>`, or `--title <title> --request <request>`; optional `--paper A3` / `--paper A4` | Create a task; a title-only task still needs sources and questions |
 | `import-image` | `--file <image> --id S1`; optional `--rotate 90`, `--crop x,y,w,h` | Save the original and working copy; does not recognize or create questions |
 | `status` | None | Read revision, source coverage, sections, uncertainties, and current artifacts |
 | `apply` | `--input <patch.json>` | Atomically apply changes with `expectedRevision` |
 | `validate` | None | Check structure, export requirements, and required images; list blockers in `problems` |
 | `preview` | Optional `--draft` | Generate HTML and page PNGs; unresolved content requires a marked draft |
-| `export` / `generate` | Optional `--answers` | Generate a student PDF and, if requested, an answer booklet with matching previews |
+| `export` / `generate` | Optional `--answers` | Generate a Word worksheet and, if requested, an answer booklet with matching previews |
 
-For `validate`, `valid:true` means structural parsing succeeded; check `exportable` to determine whether export is allowed. Blockers produce exit code `2`. Other execution errors use exit code `1` and write JSON to stderr. Draft mode cannot generate a final PDF or answer booklet.
+For `validate`, `valid:true` means structural parsing succeeded; check `exportable` to determine whether export is allowed. Blockers produce exit code `2`. Other execution errors use exit code `1` and write JSON to stderr. Draft mode cannot generate a final Word worksheet or answer booklet.
 
 ## Layout and editing
 
@@ -226,14 +227,14 @@ Each task is stored independently. Files are created as needed:
 ├── latest.json                # Most recent success matching the task when generated
 └── exports/r0001-<id>/         # Separate directory for each generation
     ├── <title>-<paper>-<date>-r1-学生卷.html
-    ├── <title>-<paper>-<date>-r1-学生卷.pdf
-    ├── <title>-<paper>-<date>-r1-答案册.html / .pdf
+    ├── <title>-<paper>-<date>-r1-学生卷.docx
+    ├── <title>-<paper>-<date>-r1-答案册.html / .docx
     ├── student-page-001.png
     ├── answers-page-001.png
     └── report.json
 ```
 
-`学生卷` denotes the student worksheet and `答案册` the answer booklet. PDFs are created only during export; answer artifacts are created only when requested. Reports include revision, question-to-page mapping, page count, paper size, text size, browser version, duration, excluded questions, and blockers.
+`学生卷` denotes the student worksheet and `答案册` the answer booklet. Reports include the revision, preview page counts and question-to-page mapping, paper size, browser version, duration, exclusions, and blockers. `docxCheck` reports the Word question count and paper dimensions. For mixed exercises, long materials, figures, tables, continued questions and layout retries, the exporter renders the DOCX locally when LibreOffice and Python with PyMuPDF are available. See `layout.review` for the layout decision and `wordReview` for rendered pages and findings. Existing tasks can be exported again.
 
 Run `status` with the saved task directory to resume in a new conversation. `latest.stale:true` means the existing files reflect an older task state and need regeneration. `latest.latestAttempt` describes the most recent running or failed attempt. Fix the cause and rerun `export` without re-uploading saved questions.
 
@@ -241,17 +242,17 @@ Closing a conversation does not delete local materials. Back up or move the enti
 
 ## Samples and printing
 
-[Desktop preview](doc/evidence/grouped-exam-desktop.png) · [Mobile preview](doc/evidence/grouped-exam-mobile.png) · [PDF checks](doc/evidence/grouped-exam-pdf-checks.json)
+[Desktop preview](doc/evidence/grouped-exam-desktop.png) · [Mobile preview](doc/evidence/grouped-exam-mobile.png) · [Historical PDF checks](doc/evidence/grouped-exam-pdf-checks.json)
 
-The development workspace retains one sample batch in `output/exam-by-type/`: six sets of 20 questions. If generated locally, open `output/exam-by-type/index.html` for student PDFs, answer booklets, HTML, and page PNGs. `manifest.json` in the same directory lists the generated files. Complete generated worksheets are not committed to the repository.
+After generating the six sets of 20 questions, open the destination’s `index.html` for the Word worksheets, answer booklets, HTML, and page PNGs. The accompanying `manifest.json` lists the generated files.
 
-| Subject | Questions per set | A4 student pages | A3 student pages |
+| Subject | Questions per set | A4 historical preview pages | A3 historical preview pages |
 | --- | --- | --- | --- |
 | Math | 20 | 7 | 4 |
 | Chinese | 20 | 8 | 5 |
 | English | 20 | 3 | 2 |
 
-These counts describe the retained question-grouping samples from November 9, 2026. Actual pagination varies with content, layout, and dependency versions. Print the generated PDF on matching A3/A4 paper at **actual size / 100%**.
+These counts describe the browser preview samples from November 9, 2026. Word repaginates using the editor’s fonts. Check the layout in Word or WPS before printing on matching A3/A4 paper at **actual size / 100%**.
 
 `output/` is ignored by Git and excluded from the installation ZIP. To recreate the complete samples in a fresh checkout or installation, select a new directory without existing tasks:
 
@@ -259,14 +260,14 @@ These counts describe the retained question-grouping samples from November 9, 20
 npm run samples -- "$HOME/mistake-workbook-tasks/samples-new"
 ```
 
-This generates HTML, PDFs, page PNGs, `manifest.json`, and `index.html` for all six sets. The retained `pdf-checks.json` and `*-pdf-contact.png` files were produced separately during acceptance checks, not by `samples`. Old directories are not automatically cleaned up. Keep the latest sample batch in `output/` and store real practice tasks separately.
+This generates Word worksheets and answer booklets, HTML, page PNGs, `manifest.json`, and `index.html` for all six sets.
 
 ## Testing and packaging
 
 ```sh
 npm run typecheck          # TypeScript checks
 npm test                   # Data, state, revision, and ZIP structure tests (source checkout)
-npm run test:integration   # Browser, pagination, interaction, and PDF tests
+npm run test:integration   # Browser, pagination, interaction, and Word tests
 # Or run npm run test:all to execute all three in sequence
 
 npm run package            # Create the ZIP and its .sha256 checksum
@@ -275,7 +276,7 @@ npm run test:install       # Verify the new ZIP in an isolated directory
 npm run test:install -- --workbuddy  # Test font download and the lightweight ZIP
 ```
 
-Unit/state tests cover sources, confirmation, merging and splitting, section numbering, answer projection, concurrent revisions, and recovery. Browser tests cover A3/A4 PDFs, question completeness, physical dimensions, continuation pages, mobile/desktop interaction, missing assets, page limits, and stale results.
+Unit/state tests cover sources, confirmation, merging and splitting, section numbering, answer projection, concurrent revisions, and recovery. Integration tests cover A3/A4 Word dimensions, question completeness, embedded images, editable equations, and answer isolation. Browser checks cover continuation pages, mobile and desktop interaction, missing assets, page limits, and stale results.
 
 `test:integration` and `test:install` need a working browser. Packaging regression tests and `test:install` need `unzip`. Installation tests install dependencies offline from the official npm registry's cache. Before the first run, use `npm ci --registry=https://registry.npmjs.org` to populate that cache. The `--workbuddy` test additionally needs network access to download the pinned font. Both tests extract and save `install-smoke.json` in a temporary directory, and print the report to the terminal. Build the corresponding package before installation testing so the archive matches the source.
 
@@ -291,6 +292,7 @@ Historical results and evidence are in the [acceptance records](doc/acceptance.m
 | --- | --- |
 | WorkBuddy rejects the ZIP because it exceeds 3 MB | Run `npm run package:workbuddy` and upload `dist/mistake-workbook-workbuddy.zip` |
 | WorkBuddy reports excessive directory depth | Run `npm run package:workbuddy` from the current source and upload the new lightweight ZIP; do not upload the full package or a ZIP of the source tree |
+| WorkBuddy reports a missing built-in font referenced by `SKILL.md` | Rebuild with the current `npm run package:workbuddy` and upload the new ZIP. It explicitly declares the font as an external dependency installed by `npm run setup:font`; the font is not bundled in this upload package |
 | Host cannot find the skill | Check the installation location and `mistake-workbook/SKILL.md` nesting. Confirm the skill is enabled in WorkBuddy or visible in the Codex / Claude Code skill or command list; reopen the session if needed |
 | Browser fails to launch | Run `npx playwright install chromium`, or check the executable in `MISTAKE_WORKBOOK_CHROME`, then run `doctor` |
 | Task directory already exists | Resume with `status`, edit with `apply`, or choose a different directory for a new task |

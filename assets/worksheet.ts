@@ -1,8 +1,10 @@
 import { prepare, layout } from '@chenglou/pretext';
 import katex from 'katex';
 import type { PublicBlock, PublicQuestion, PublicSheet } from '../scripts/projection.ts';
+import { reviewLayout } from './layout-review.ts';
 
 const data: PublicSheet = JSON.parse(document.querySelector('#sheet-data')!.textContent!);
+const allOral = data.questions.length > 0 && data.questions.every(q => q.oralExpression);
 const mm = 96 / 25.4;
 const [paperWidth, paperHeight] = data.layout.paperSize === 'A3' ? [297, 420] : [210, 297];
 const papers: HTMLElement[] = [];
@@ -19,7 +21,10 @@ function measure(text: string, width: number) {
 function el(tag: string, cls = '', text?: string): HTMLElement { const n = document.createElement(tag); n.className = cls; if (text !== undefined) n.textContent = text; return n; }
 function richText(text: string, target: HTMLElement) {
   for (const part of text.split(/(\\\([\s\S]*?\\\))/g)) {
-    if (part.startsWith('\\(') && part.endsWith('\\)')) { const span = el('span', 'formula'); katex.render(part.slice(2, -2), span, { throwOnError: true, trust: false, strict: 'error', output: 'html', maxExpand: 1000 }); target.append(span); }
+    if (part.startsWith('\\(') && part.endsWith('\\)')) {
+      const span = el('span', 'formula'); span.dataset.tex = part.slice(2, -2);
+      katex.render(span.dataset.tex, span, { throwOnError: true, trust: false, strict: 'error', output: 'html', maxExpand: 1000 }); target.append(span);
+    }
     else target.append(document.createTextNode(part));
   }
 }
@@ -56,12 +61,13 @@ function workspace(height: number, style: string, rowMm: number): HTMLElement[] 
   }
   return result;
 }
-function blocks(items: PublicBlock[], width: number): HTMLElement[] {
+function blocks(items: PublicBlock[], width: number, trackStarts = false): HTMLElement[] {
   const result: HTMLElement[] = [];
-  for (const b of items) {
+  for (const [index, b] of items.entries()) {
+    const start = result.length;
     switch (b.type) {
       case 'text': for (const text of paragraphs(b.text, width)) { const p = el('p', 'prompt'); richText(text, p); result.push(p); } break;
-      case 'formula': { const p = el('div', 'formula formula-block'); katex.render(b.tex, p, { throwOnError: true, trust: false, strict: 'error', output: 'html', maxExpand: 1000, displayMode: true }); result.push(p); break; }
+      case 'formula': { const p = el('div', 'formula formula-block'); p.dataset.tex = b.tex; katex.render(b.tex, p, { throwOnError: true, trust: false, strict: 'error', output: 'html', maxExpand: 1000, displayMode: true }); result.push(p); break; }
       case 'options': {
         b.items.forEach(t => { const options = el('div', 'options'); const p = el('p'); richText(t, p); options.append(p); result.push(options); }); break;
       }
@@ -99,6 +105,7 @@ function blocks(items: PublicBlock[], width: number): HTMLElement[] {
         result.push(group); break;
       }
     }
+    if (trackStarts && result.length > start) result[start].dataset.blockStart = String(index);
   }
   return result;
 }
@@ -107,28 +114,40 @@ function makeQuestion(q: PublicQuestion, width: number, continuation = false): H
   article.dataset.sectionId = q.sectionId;
   if (continuation) article.dataset.continuation = 'true';
   article.append(el('div', 'question-label', `${continuation ? `第 ${q.number} 题（续）` : `${q.number}.`}${data.draft && q.pending ? ' · 待确认' : ''}`));
-  if (!continuation) article.append(...blocks(q.blocks, width), ...workspace(q.workspaceMm, q.workspaceStyle, q.workspaceRowMm));
+  if (!continuation && q.oralExpression) {
+    article.classList.add('oral-question');
+    const blank = el('span', 'oral-answer');
+    blank.setAttribute('aria-hidden', 'true');
+    article.append(el('span', 'oral-expression', q.oralExpression), blank);
+  } else if (!continuation) article.append(...blocks(q.blocks, width, true), ...workspace(q.workspaceMm, q.workspaceStyle, q.workspaceRowMm));
   return article;
 }
-const subjectLabels: Record<string, string> = { math: '数学', chinese: '语文', english: '英语' };
 function sectionHeading(sectionId: string, continuation = false): HTMLElement {
   const section = data.sections.find(s => s.id === sectionId)!;
   const digits = ['', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
   const n = section.number;
   const ordinal = n < 10 ? digits[n] : `${n >= 20 ? digits[Math.floor(n / 10)] : ''}十${digits[n % 10]}`;
-  const heading = el('h3', 'section-heading', `${ordinal}、${section.title}${continuation ? '（续）' : ''}`);
+  const title = allOral && data.oralLayout
+    ? continuation ? data.oralLayout.continuation : data.oralLayout.instruction
+    : `${ordinal}、${section.title}${continuation ? '（续）' : ''}`;
+  const heading = el('h3', 'section-heading', title);
   heading.dataset.sectionId = sectionId;
   if (continuation) heading.dataset.continuation = 'true';
-  heading.append(el('span', 'section-count', `共 ${section.count} 题`));
+  if (!allOral || !continuation) heading.append(el('span', 'section-count', `共 ${section.count} 题`));
   return heading;
 }
 function newPage(subject: string): HTMLElement {
   const paper = el('section', 'paper'); paper.style.setProperty('--paper-width', `${paperWidth}mm`); paper.style.setProperty('--paper-height', `${paperHeight}mm`);
-  const header = el('header', 'sheet-header'); header.append(el('h2', '', data.title));
-  header.append(el('div', 'sheet-meta', `${subjectLabels[subject]}${data.grade ? ` · ${data.grade}` : ''}　姓名：____________　日期：____________`));
+  const header = el('header', 'sheet-header'); header.append(el('h2', '', data.subjectTitles[subject]));
+  if (data.studentInfo) header.append(el('p', 'sheet-meta', data.studentInfo));
   if (data.draft) header.append(el('div', 'draft-label', '草稿 · 存在待处理内容，禁止正式打印'));
   const body = el('div', 'sheet-body');
-  const footer = el('footer', 'sheet-footer'); footer.append(el('span', '', `${data.layout.paperSize} · r${data.revision} · ${data.kind === 'student' ? '学生练习' : '独立答案册'}`), el('span', 'page-number'));
+  const footer = el('footer', allOral ? 'sheet-footer oral-footer' : 'sheet-footer');
+  if (!allOral) {
+    const footerText = [data.grade, data.layout.paperSize, `r${data.revision}`, data.kind === 'student' ? '学生练习' : '独立答案册'].filter(Boolean).join(' · ');
+    footer.append(el('span', '', footerText));
+  }
+  footer.append(el('span', 'page-number'));
   paper.append(header, body, footer);
   const frame = el('div', 'paper-frame'); frame.id = `page-${papers.length + 1}`; frame.append(paper); root.append(frame); papers.push(paper);
   if (body.clientHeight < 60 * mm) throw new Error('标题过高，正文空间不足，请缩短标题');
@@ -138,7 +157,7 @@ function fits(body: HTMLElement): boolean { return body.scrollHeight <= body.cli
 function horizontalFits(q: HTMLElement): boolean {
   if (q.querySelector('[data-too-wide]')) return false;
   const right = q.getBoundingClientRect().right;
-  return [q, ...Array.from(q.querySelectorAll<HTMLElement>('.formula,.grid-group,.pinyin,.question-table,.prompt,img'))].every(n => n.scrollWidth <= n.clientWidth + 1 && n.getBoundingClientRect().right <= right + 1);
+  return [q, ...Array.from(q.querySelectorAll<HTMLElement>('.formula,.grid-group,.pinyin,.question-table,.prompt,.oral-expression,img'))].every(n => n.scrollWidth <= n.clientWidth + 1 && n.getBoundingClientRect().right <= right + 1);
 }
 function row(columns: number): HTMLElement { const r = el('div', 'row'); r.style.setProperty('--columns', String(columns)); r.dataset.columns = String(columns); return r; }
 async function render() {
@@ -166,7 +185,10 @@ async function render() {
     }
     if (columns < 1 || !article) throw new Error(`第 ${q.number} 题超过单栏宽度：请拆分长公式、表格或调整字格/题图宽度`);
     if (columns !== q.columns) warnings.add(`第 ${q.number} 题由 ${q.columns} 栏调整为 ${columns} 栏，保持字号和书写区`);
-    if (!currentRow || Number(currentRow.dataset.columns) !== columns || currentRow.children.length >= columns) { currentRow = row(columns); body.append(currentRow); }
+    if (!currentRow || Number(currentRow.dataset.columns) !== columns || currentRow.children.length >= columns ||
+        currentRow.firstElementChild?.classList.contains('oral-question') !== Boolean(q.oralExpression)) {
+      currentRow = row(columns); body.append(currentRow);
+    }
     currentRow.append(article);
     if (fits(body)) continue;
     article.remove(); if (!currentRow.children.length) currentRow.remove();
@@ -205,6 +227,7 @@ async function render() {
     warnings.add(`第 ${q.number} 题按逻辑内容块续页`); currentRow = undefined;
   }
   measurement.remove();
+  const review = reviewLayout(papers, data, fits);
   if (data.layout.maxPages && papers.length > data.layout.maxPages) throw new Error(`需要 ${papers.length} 页，超过限制 ${data.layout.maxPages} 页。请减少题量、调整合法字号或留白；未丢弃题目`);
   const questionPages: Record<string, number[]> = {};
   papers.forEach((paper, i) => {
@@ -214,7 +237,7 @@ async function render() {
   });
   const actualIds = Object.keys(questionPages);
   if (actualIds.length !== data.questions.length || data.questions.some(q => !questionPages[q.id])) throw new Error('题目 ID 对账失败');
-  const report = { pages: papers.length, questions: data.questions.length, questionPages, fontPt: data.layout.fontPt, paperSize: data.layout.paperSize, pretextMeasurements: measurements, warnings: [...warnings] };
+  const report = { pages: papers.length, questions: data.questions.length, questionPages, fontPt: data.layout.fontPt, paperSize: data.layout.paperSize, pretextMeasurements: measurements, warnings: [...warnings], review };
   (window as any).__worksheetReport = report;
   document.querySelector('.status')!.textContent = `${data.layout.paperSize} · ${data.sections.length} 个题型分组 · ${report.questions} 题 · ${report.pages} 页 · ${data.layout.fontPt} pt · r${data.revision}${data.draft ? ' · 草稿，待处理疑点' : ''}`;
   document.querySelector('.warnings')!.textContent = [...warnings].join('；');
